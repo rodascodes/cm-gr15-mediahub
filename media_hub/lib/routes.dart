@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:media_hub/bottom_nav/forum_page.dart';
+import 'package:media_hub/bottom_nav/forum_screen.dart';
 import 'package:media_hub/bottom_nav/home_screen.dart';
-import 'package:media_hub/bottom_nav/profile_page.dart';
-import 'package:media_hub/bottom_nav/search_page.dart';
+import 'package:media_hub/bottom_nav/profile_screen.dart';
+import 'package:media_hub/bottom_nav/search_screen.dart';
 import 'package:media_hub/login.dart';
 import 'package:media_hub/main_scaffold.dart';
 import 'package:media_hub/register.dart';
@@ -55,7 +55,7 @@ final router = GoRouter(
           path: '/profile',
           name: 'profile',
           pageBuilder: (context, state) => CustomTransitionPage(
-            child: ProfilePage(),
+            child: ProfileScreen(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) =>
                     FadeTransition(opacity: animation, child: child),

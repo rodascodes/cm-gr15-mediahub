@@ -25,8 +25,8 @@ class MainScaffold extends StatelessWidget {
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: currentIndex,
         onItemTapped: (index) {
-          context.go(routes[
-              index]); //Context.go permite uma navegação declarativa (neste caso passamos uma rota variàvel consoante o index)
+          context.push(routes[ //push is better than go cause with push we can go back :)
+              index]);
         },
       ),
     );
