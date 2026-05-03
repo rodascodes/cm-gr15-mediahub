@@ -149,3 +149,13 @@ class HorizontalMediaCard extends StatelessWidget {
     );
   }
 }
+
+class Media {
+  final String title;
+  final String type;
+  final double rating;
+  final IconData icon;
+  final Color color;
+
+  Media(this.title, this.type, this.rating, this.icon, this.color);
+}
