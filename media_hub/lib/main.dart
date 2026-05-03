@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:media_hub/routes.dart';
 
 void main() {
   runApp(const MainApp());
 }
+
+final router = GoRouter(
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const MoviePage(),
+    ),
+  ],
+);
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: router,
+    return const MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Text('Hello World!'),
+        ),
+      ),
     );
   }
 }
