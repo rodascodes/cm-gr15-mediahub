@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:media_hub/util/app_colors.dart';
+import 'package:go_router/go_router.dart';
 
 class _MockupUser {
   static String name = "João Silva";
@@ -199,31 +200,33 @@ class _Favourite extends StatelessWidget{
   @override
   Widget build(BuildContext context)
   {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.purple.shade50,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          SizedBox(height: 100, width: 50, child: Image.network("https://cdn.nos.pt/cinemas/movies/files/700x1000/ad6c2d27-24a4-4736-a31c-aa2b9826cbdc_Image.jpg"),),
-          SizedBox(width: 10),
-          Expanded(
-            child:Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title),
-                Text(mediaType, style: TextStyle(color: Colors.grey)),
-              ],
+    return GestureDetector(
+      onTap: () => context.push('/info'),
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.purple.shade50,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            SizedBox(height: 100, width: 50, child: Image.network("https://cdn.nos.pt/cinemas/movies/files/700x1000/ad6c2d27-24a4-4736-a31c-aa2b9826cbdc_Image.jpg"),),
+            SizedBox(width: 10),
+            Expanded(
+              child:Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title),
+                  Text(mediaType, style: TextStyle(color: Colors.grey)),
+                ],
+              ),
             ),
-          ),
-          
-          Text("⭐$rating"),
-        ],
-        
-      ),
+            
+            Text("⭐$rating"),
+          ],
+        ),
+      )
     );
   }
 
