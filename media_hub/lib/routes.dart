@@ -6,6 +6,7 @@ import 'package:media_hub/bottom_nav/profile_screen.dart';
 import 'package:media_hub/bottom_nav/search_screen.dart';
 import 'package:media_hub/login.dart';
 import 'package:media_hub/main_scaffold.dart';
+import 'package:media_hub/page_info.dart';
 import 'package:media_hub/register.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -73,5 +74,10 @@ final router = GoRouter(
       name: 'register',
       builder: (context, state) => RegisterScreen(),
     ),
+    GoRoute(
+      path: '/info',
+      name: 'info',
+      builder: (context, state) => MoviePage(),
+    )
   ],
 );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MoviePage extends StatelessWidget {
   const MoviePage({super.key});
@@ -24,8 +25,10 @@ class MoviePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
-                  const Icon(Icons.arrow_back, color: Colors.white),
+                  GestureDetector(
+                    onTap: () => context.pop(),
+                    child: const Icon(Icons.arrow_back, color: Colors.white),
+                  ),
 
                   const SizedBox(height: 20),
 
