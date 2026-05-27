@@ -8,4 +8,8 @@ class AppColors{
     //HEADER:
     static const Color profileHeaderG1 = Color.fromARGB(255, 123, 44, 191);
     static const Color profileHeaderG2 = Color.fromARGB(255, 247, 37, 133);
+  //GENERAL:
+    static const primary = Color(0xFF7700FF);
+    static const hintText = Color(0xFF9E9E9E);
+    static const inputBackground = Color(0xFFF5F5F5);
 }

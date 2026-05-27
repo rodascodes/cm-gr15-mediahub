@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:media_hub/mediacard.dart';
+import 'package:media_hub/util/mediacard.dart';
 //import 'package:go_router/go_router.dart'; Irá ser implementado quando o Pedro mandar o código da página Info
 
 
