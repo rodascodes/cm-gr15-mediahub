@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import './app_colors.dart'; 
 
 class TextFields extends StatefulWidget {
   final String hintText;
@@ -35,24 +34,30 @@ class _TextFieldsState extends State<TextFields> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return TextFormField(
       controller: widget.controller,
       obscureText: _hideText,
       keyboardType: widget.keyboardType,
       validator: widget.validator,
-      style: const TextStyle(fontSize: 16),
+      style: TextStyle(
+        fontSize: 16,
+        color: isDark ? Colors.white : Colors.black, 
+      ),
+
       decoration: InputDecoration(
         hintText: widget.hintText,
-        hintStyle: const TextStyle(color: AppColors.hintText),
+        hintStyle: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[600]),
         filled: true,
-        fillColor: AppColors.inputBackground,
-        prefixIcon: Icon(widget.prefixIcon, color: Colors.blueGrey),
+        fillColor: isDark ? const Color.fromARGB(255, 40, 40, 40) : Colors.grey[100],
+        prefixIcon: Icon(widget.prefixIcon, color: isDark ? Colors.grey[400] : Colors.blueGrey),
         
         suffixIcon: widget.isPassword
             ? IconButton(
                 icon: Icon(
                   _hideText ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.blueGrey,
+                  color: isDark ? Colors.grey[400] : Colors.blueGrey,
                 ),
                 onPressed: () {
                   setState(() {
@@ -69,7 +74,7 @@ class _TextFieldsState extends State<TextFields> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
         ),
       ),
     );

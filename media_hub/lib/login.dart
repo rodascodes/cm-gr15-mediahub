@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:media_hub/main.dart';
 import 'package:go_router/go_router.dart';
 import '../util/text_fields.dart'; 
+import '../util/app_validators.dart';
 
 class _LoginFields extends StatelessWidget {
   const _LoginFields();
@@ -24,15 +26,7 @@ class _LoginFields extends StatelessWidget {
           hintText: 'Email',
           prefixIcon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Insert your email';
-            }
-            if (!value.contains('@')) {
-              return 'Insert a valid email';
-            }
-            return null; 
-          },
+          validator: AppValidators.validateEmail,
         ),
 
         const SizedBox(height: 16),
@@ -41,15 +35,8 @@ class _LoginFields extends StatelessWidget {
           hintText: 'Password',
           prefixIcon: Icons.lock_outlined,
           isPassword: true,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Password is required';
-            }
-            if (value.length < 6) {
-              return 'Password must be at least 6 characters';
-            }
-            return null;
-          }, 
+          //Login doesn't require the same password complexity as registration, so we only check if it's not empty
+          validator: AppValidators.validateNonEmptyPassword,
         ),
 
         const SizedBox(height: 24),
@@ -69,9 +56,9 @@ class _LoginFields extends StatelessWidget {
         Center(
           child: GestureDetector(
             onTap: () => context.go('/register'),
-            child: const Text(
+            child: Text(
               "Don't have an account yet? Register here", 
-              style: TextStyle(fontSize: 10, color: Color.fromARGB(255, 0, 0, 64)),
+              style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.primary),
             ),
           ), 
         )
@@ -94,6 +81,7 @@ class _LoginFormState extends State<_LoginForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _loginFormKey,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       child: const _LoginFields(), 
     );
   }
@@ -104,10 +92,18 @@ class LoginScreen extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login", style: TextStyle(color: Colors.white)), 
-        backgroundColor: const Color.fromARGB(255, 119, 0, 255),
+        title: const Text("Login", style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))), 
+        actions: [
+          IconButton(
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+            onPressed: () {
+              themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
+            },
+          )
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
