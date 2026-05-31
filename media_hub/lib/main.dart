@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:media_hub/routes.dart';
+import 'util/app_colors.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
@@ -21,21 +22,25 @@ class MainApp extends StatelessWidget {
           
           theme: ThemeData(
             brightness: Brightness.light,
-            colorSchemeSeed: const Color.fromARGB(255, 119, 0, 255),
-            scaffoldBackgroundColor: Colors.white, 
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Color.fromARGB(255, 119, 0, 255), 
-              foregroundColor: Colors.white,
+            colorSchemeSeed: AppColors.primary, 
+            scaffoldBackgroundColor: AppColors.lightBackground,
+            cardColor: AppColors.lightSurface,                 
+            
+            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+              backgroundColor: AppColors.lightBackground,
+              selectedItemColor: AppColors.primary,
             ),
           ),
-          
+
           darkTheme: ThemeData(
             brightness: Brightness.dark,
-            colorSchemeSeed: const Color.fromARGB(255, 119, 0, 255),
-            scaffoldBackgroundColor: const Color.fromARGB(255, 20, 20, 20), 
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Color.fromARGB(255, 40, 0, 80), 
-              foregroundColor: Colors.white,
+            colorSchemeSeed: AppColors.primary, 
+            scaffoldBackgroundColor: AppColors.darkBackground, 
+            cardColor: AppColors.darkSurface,                  
+            
+            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+              backgroundColor: AppColors.darkBackground,
+              selectedItemColor: AppColors.primary,
             ),
           ),
           

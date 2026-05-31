@@ -22,9 +22,7 @@ class MediaCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.push('/info'),
       child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 4,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,32 +31,26 @@ class MediaCard extends StatelessWidget {
               height: 80,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: color,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
-                ),
+                color: color, 
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
               ),
-              child: Icon(
-                icon,
-                color: Colors.white,
-                size: 40,
-              ),
+              child: Icon(icon, color: Colors.white, size: 40),
             ),
             Padding(
               padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  Text(type, style: const TextStyle(color: Colors.grey)),
+                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold)), 
+                  
+                  Text(type, style: TextStyle(color: Theme.of(context).hintColor)), 
+                  
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.star,
-                          size: 16, color: Colors.amber),
+                      const Icon(Icons.star, size: 16, color: Colors.amber),
                       const SizedBox(width: 4),
-                      Text(rating.toString()),
+                      Text(rating.toString()), 
                     ],
                   ),
                 ],
@@ -68,8 +60,6 @@ class MediaCard extends StatelessWidget {
         ),
       ),
     );
-    
-    
   }
 }
 
@@ -97,56 +87,34 @@ class HorizontalMediaCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12), 
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.grey[100], 
+          color: Theme.of(context).cardColor, 
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
             Container(
-              width: 70,
-              height: 70,
+              width: 70, height: 70,
               decoration: BoxDecoration(
                 color: color, 
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(
-                icon,
-                color: Colors.white,
-                size: 32,
-              ),
+              child: Icon(icon, color: Colors.white, size: 32),
             ),
-            
             const SizedBox(width: 16), 
-
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold, 
-                      fontSize: 16,
-                    ),
-                  ),
+                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   const SizedBox(height: 4),
-                  Text(
-                    type, 
-                    style: const TextStyle(
-                      color: Colors.grey, 
-                      fontSize: 14,
-                    ),
-                  ),
+                  Text(type, style: TextStyle(color: Theme.of(context).hintColor, fontSize: 14)),
                   const SizedBox(height: 6),
                   Row(
                     children: [
                       const Icon(Icons.star, size: 16, color: Colors.amber),
                       const SizedBox(width: 4),
-                      Text(
-                        rating.toString(),
-                        style: const TextStyle(fontWeight: FontWeight.w500),
-                      ),
+                      Text(rating.toString(), style: const TextStyle(fontWeight: FontWeight.w500)),
                     ],
                   ),
                 ],
@@ -156,7 +124,123 @@ class HorizontalMediaCard extends StatelessWidget {
         ),
       )
     );
-    
+  }
+}
+
+class AvatarCircle extends StatelessWidget {
+  final String name;
+
+  const AvatarCircle({super.key, required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    final initials = name.isNotEmpty
+        ? name.trim().split(' ').map((e) => e[0]).take(2).join().toUpperCase()
+        : '?';
+        
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return CircleAvatar(
+      radius: 20,
+      backgroundColor: isDark ? Colors.grey[800] : Colors.grey[300],
+      child: Text(
+        initials,
+        style: TextStyle(
+          color: isDark ? Colors.grey[400] : Colors.grey[600],
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
+      ),
+    );
+  }
+}
+
+class TopicCard extends StatelessWidget {
+  final String title;
+  final String author;
+  final String category;
+  final Color categoryColor;
+  final String timeAgo;
+  final int comments;
+  final int likes;
+
+  const TopicCard({
+    super.key,
+    required this.title,
+    required this.author,
+    required this.category,
+    required this.categoryColor,
+    required this.timeAgo,
+    required this.comments,
+    required this.likes,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AvatarCircle(name: author),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                const SizedBox(height: 4),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 2,
+                  children: [
+                    Text(author, style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12)),
+                    Text(' • ', style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: categoryColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        category,
+                        style: TextStyle(
+                          color: categoryColor,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Text(' • ', style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12)),
+                    Text(timeAgo, style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(Icons.chat_bubble_outline, size: 14, color: Theme.of(context).hintColor),
+                    const SizedBox(width: 4),
+                    Text('$comments', style: TextStyle(color: Theme.of(context).hintColor, fontSize: 13)),
+                    const SizedBox(width: 16),
+                    Icon(Icons.thumb_up_alt_outlined, size: 14, color: Theme.of(context).hintColor),
+                    const SizedBox(width: 4),
+                    Text('$likes', style: TextStyle(color: Theme.of(context).hintColor, fontSize: 13)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

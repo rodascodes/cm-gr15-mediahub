@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:media_hub/util/app_colors.dart';
+import 'package:media_hub/util/mediacard.dart';
+import '../main.dart';
 
 // ─── Data models ────────────────────────────────────────────────────────────
 
@@ -71,7 +72,7 @@ final List<_ForumTopic> _recentTopics = [
     title: 'Melhor filme de 2024?',
     author: 'Carlos Sousa',
     category: 'Filmes',
-    categoryColor: AppColors.navbarSelectedColor,
+    categoryColor: AppColors.primary,
     timeAgo: '2h atrás',
     comments: 156,
     likes: 234,
@@ -80,7 +81,7 @@ final List<_ForumTopic> _recentTopics = [
     title: 'Recomendações de sci-fi para iniciantes',
     author: 'Rita Mendes',
     category: 'Livros',
-    categoryColor: AppColors.navbarSelectedColor,
+    categoryColor: AppColors.primary,
     timeAgo: '5h atrás',
     comments: 89,
     likes: 145,
@@ -89,7 +90,7 @@ final List<_ForumTopic> _recentTopics = [
     title: 'The Last of Us vs The Walking Dead',
     author: 'Miguel Santos',
     category: 'Séries',
-    categoryColor: AppColors.navbarSelectedColor,
+    categoryColor: AppColors.primary,
     timeAgo: '8h atrás',
     comments: 203,
     likes: 318,
@@ -98,224 +99,43 @@ final List<_ForumTopic> _recentTopics = [
     title: 'Dune 3 vai mesmo acontecer?',
     author: 'Ana Ferreira',
     category: 'Filmes',
-    categoryColor: AppColors.navbarSelectedColor,
+    categoryColor: AppColors.primary,
     timeAgo: '12h atrás',
     comments: 74,
     likes: 98,
   ),
 ];
 
-// ─── Sub-widgets ─────────────────────────────────────────────────────────────
-
-class _DiscussedCard extends StatelessWidget {
-  final _DiscussedItem item;
-
-  const _DiscussedCard({required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => context.push('/info'),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: item.color,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(item.icon, color: Colors.white, size: 28),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(Icons.chat_bubble_outline,
-                          size: 14, color: Colors.grey),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${item.comments}',
-                        style: const TextStyle(color: Colors.grey, fontSize: 13),
-                      ),
-                      const SizedBox(width: 12),
-                      const Icon(Icons.star, size: 14, color: Colors.amber),
-                      const SizedBox(width: 4),
-                      Text(
-                        item.rating.toString(),
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      )
-    );
-  }
-}
-
-class _AvatarCircle extends StatelessWidget {
-  final String name;
-
-  const _AvatarCircle({required this.name});
-
-  @override
-  Widget build(BuildContext context) {
-    final initials = name.isNotEmpty
-        ? name.trim().split(' ').map((e) => e[0]).take(2).join()
-        : '?';
-    return CircleAvatar(
-      radius: 20,
-      backgroundColor: Colors.grey[300],
-      child: Text(
-        initials,
-        style: const TextStyle(
-          color: Colors.grey,
-          fontWeight: FontWeight.bold,
-          fontSize: 13,
-        ),
-      ),
-    );
-  }
-}
-
-class _TopicCard extends StatelessWidget {
-  final _ForumTopic topic;
-
-  const _TopicCard({required this.topic});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _AvatarCircle(name: topic.author),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  topic.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 2,
-                  children: [
-                    Text(
-                      topic.author,
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
-                    ),
-                    const Text(' • ',
-                        style: TextStyle(color: Colors.grey, fontSize: 12)),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: topic.categoryColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        topic.category,
-                        style: TextStyle(
-                          color: topic.categoryColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const Text(' • ',
-                        style: TextStyle(color: Colors.grey, fontSize: 12)),
-                    Text(
-                      topic.timeAgo,
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.chat_bubble_outline,
-                        size: 14, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${topic.comments}',
-                      style: const TextStyle(color: Colors.grey, fontSize: 13),
-                    ),
-                    const SizedBox(width: 16),
-                    const Icon(Icons.thumb_up_alt_outlined,
-                        size: 14, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${topic.likes}',
-                      style: const TextStyle(color: Colors.grey, fontSize: 13),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 // ─── Main page ───────────────────────────────────────────────────────────────
-
 class ForumPage extends StatelessWidget {
   const ForumPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+            onPressed: () {
+              themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
+            },
+          )
+        ],
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             Text(
               'Forum',
               style: TextStyle(
-                color: AppColors.navbarSelectedColor,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               ),
             ),
-            Text(
+            const Text(
               'Discussões da comunidade',
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
@@ -328,21 +148,15 @@ class ForumPage extends StatelessWidget {
           children: [
             const Divider(),
 
-            // ── Mais Discutidos ──────────────────────────────────────────
             Padding(
-              padding: const EdgeInsets.only(
-                  left: 16, top: 16, right: 16, bottom: 8),
+              padding: const EdgeInsets.only(left: 16, top: 16, right: 16, bottom: 8),
               child: Row(
-                children: const [
-                  Icon(Icons.trending_up,
-                      size: 18, color: AppColors.navbarSelectedColor),
-                  SizedBox(width: 6),
-                  Text(
+                children: [
+                  Icon(Icons.trending_up, size: 18, color: Theme.of(context).colorScheme.primary),
+                  const SizedBox(width: 6),
+                  const Text(
                     'Mais Discutidos',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -353,25 +167,27 @@ class ForumPage extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: _mostDiscussed.length,
-              itemBuilder: (context, index) =>
-                  _DiscussedCard(item: _mostDiscussed[index]),
+              itemBuilder: (context, index) {
+                final item = _mostDiscussed[index];
+                
+                return HorizontalMediaCard(
+                  title: item.title,
+                  type: '${item.comments} comentários', 
+                  rating: item.rating,
+                  icon: item.icon,
+                  color: item.color,
+                );
+              },
             ),
-
-            // ── Tópicos Recentes ─────────────────────────────────────────
             Padding(
-              padding: const EdgeInsets.only(
-                  left: 16, top: 16, right: 16, bottom: 8),
+              padding: const EdgeInsets.only(left: 16, top: 16, right: 16, bottom: 8),
               child: Row(
-                children: const [
-                  Icon(Icons.access_time,
-                      size: 18, color: AppColors.navbarSelectedColor),
-                  SizedBox(width: 6),
-                  Text(
+                children: [
+                  Icon(Icons.access_time, size: 18, color: Theme.of(context).colorScheme.primary),
+                  const SizedBox(width: 6),
+                  const Text(
                     'Tópicos Recentes',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -382,8 +198,19 @@ class ForumPage extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: _recentTopics.length,
-              itemBuilder: (context, index) =>
-                  _TopicCard(topic: _recentTopics[index]),
+              itemBuilder: (context, index) {
+                final topic = _recentTopics[index];
+                
+                return TopicCard(
+                  title: topic.title,
+                  author: topic.author,
+                  category: topic.category,
+                  categoryColor: topic.categoryColor,
+                  timeAgo: topic.timeAgo,
+                  comments: topic.comments,
+                  likes: topic.likes,
+                );
+              },
             ),
 
             const SizedBox(height: 20),

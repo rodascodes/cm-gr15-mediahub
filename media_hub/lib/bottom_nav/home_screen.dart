@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:media_hub/util/mediacard.dart';
+import '../main.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final List<Media> trendingList = [
       Media('Dune: Part Two', 'Movie', 8.9, Icons.movie, Colors.orange),
@@ -27,13 +29,21 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
+        actions: [
+          IconButton(
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+            onPressed: () {
+              themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
+            },
+          )
+        ],
+        title: Column(   
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             Text(
               'Home',
-              style: TextStyle(color: Color.fromARGB(255, 119, 0, 255)),
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
             ),
             Text('For You', style: TextStyle(fontSize: 12)),
           ],
@@ -45,7 +55,7 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Divider(),
-            const Padding(
+             Padding(
               padding: EdgeInsets.only(
                 left: 16.0,
                 top: 16.0,
@@ -56,7 +66,7 @@ class HomeScreen extends StatelessWidget {
                 'Trending',
                 style: TextStyle(
                   fontSize: 20,
-                  color: Color.fromARGB(255, 119, 0, 255),
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ),
@@ -83,7 +93,7 @@ class HomeScreen extends StatelessWidget {
                 );
               },
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(
                 left: 16.0,
                 top: 12.0,
@@ -94,7 +104,7 @@ class HomeScreen extends StatelessWidget {
                 'Recommended',
                 style: TextStyle(
                   fontSize: 20,
-                  color: Color.fromARGB(255, 119, 0, 255),
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ),
@@ -116,7 +126,7 @@ class HomeScreen extends StatelessWidget {
               },
             ),
 
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(
                 left: 16.0,
                 top: 12.0,
@@ -127,7 +137,7 @@ class HomeScreen extends StatelessWidget {
                 'Classified Recently',
                 style: TextStyle(
                   fontSize: 20,
-                  color: Color.fromARGB(255, 119, 0, 255),
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ),

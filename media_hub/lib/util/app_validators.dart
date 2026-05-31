@@ -54,8 +54,8 @@ class AppValidators {
   }
 
   static String? validateNonEmptyPassword(String? value) {
-    if (value == null || value.isEmpty || validatePassword(value) != null) {
-      return 'Valid password is required';
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
     }
     return null;
   }
