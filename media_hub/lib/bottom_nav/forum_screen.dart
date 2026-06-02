@@ -121,7 +121,7 @@ class ForumPage extends StatelessWidget {
             onPressed: () {
               themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
             },
-          )
+          ),
         ],
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,10 +149,19 @@ class ForumPage extends StatelessWidget {
             const Divider(),
 
             Padding(
-              padding: const EdgeInsets.only(left: 16, top: 16, right: 16, bottom: 8),
+              padding: const EdgeInsets.only(
+                left: 16,
+                top: 16,
+                right: 16,
+                bottom: 8,
+              ),
               child: Row(
                 children: [
-                  Icon(Icons.trending_up, size: 18, color: Theme.of(context).colorScheme.primary),
+                  Icon(
+                    Icons.trending_up,
+                    size: 18,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   const SizedBox(width: 6),
                   const Text(
                     'Mais Discutidos',
@@ -169,10 +178,10 @@ class ForumPage extends StatelessWidget {
               itemCount: _mostDiscussed.length,
               itemBuilder: (context, index) {
                 final item = _mostDiscussed[index];
-                
+
                 return HorizontalMediaCard(
                   title: item.title,
-                  type: '${item.comments} comentários', 
+                  type: '${item.comments} comentários',
                   rating: item.rating,
                   icon: item.icon,
                   color: item.color,
@@ -180,10 +189,19 @@ class ForumPage extends StatelessWidget {
               },
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 16, top: 16, right: 16, bottom: 8),
+              padding: const EdgeInsets.only(
+                left: 16,
+                top: 16,
+                right: 16,
+                bottom: 8,
+              ),
               child: Row(
                 children: [
-                  Icon(Icons.access_time, size: 18, color: Theme.of(context).colorScheme.primary),
+                  Icon(
+                    Icons.access_time,
+                    size: 18,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   const SizedBox(width: 6),
                   const Text(
                     'Tópicos Recentes',
@@ -200,7 +218,7 @@ class ForumPage extends StatelessWidget {
               itemCount: _recentTopics.length,
               itemBuilder: (context, index) {
                 final topic = _recentTopics[index];
-                
+
                 return TopicCard(
                   title: topic.title,
                   author: topic.author,

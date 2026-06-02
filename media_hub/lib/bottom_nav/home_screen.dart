@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:media_hub/util/mediacard.dart';
+import '../util/tmdb_service.dart';
 import '../main.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -7,6 +8,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tmdbService = TmdbService();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final List<Media> trendingList = [
@@ -71,28 +73,53 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
 
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(10),
-              itemCount: trendingList.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 0.75,
-              ),
-              itemBuilder: (context, index) {
-                final media = trendingList[index];
-                return MediaCard(
-                  title: media.title,
-                  type: media.type,
-                  rating: media.rating,
-                  icon: media.icon,
-                  color: media.color,
-                );
-              },
-            ),
+            FutureBuilder<List<Media>>(
+  future: tmdbService.getTrendingMovies(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    } 
+    else if (snapshot.hasError) {
+      return Center(
+        child: Text('Erro ao carregar filmes: ${snapshot.error}'),
+      );
+    } 
+    else if (snapshot.hasData) {
+      final trendingList = snapshot.data!;
+      
+      return GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(10),
+
+        itemCount: trendingList.length > 4 ? 4 : trendingList.length, 
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 0.75,
+        ),
+        itemBuilder: (context, index) {
+          final media = trendingList[index];
+          return MediaCard(
+            title: media.title,
+            type: media.type,
+            rating: double.parse(media.rating.toStringAsFixed(1)),
+            icon: media.icon,
+            color: media.color,
+          );
+        },
+      );
+    }
+    
+    return const SizedBox.shrink(); 
+  },
+),
             Padding(
               padding: EdgeInsets.only(
                 left: 16.0,
