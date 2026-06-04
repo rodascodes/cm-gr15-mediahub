@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:media_hub/util/mediacard.dart';
 
 class MoviePage extends StatelessWidget {
-  const MoviePage({super.key});
+  final Media media;
+
+  const MoviePage({
+    super.key,
+    required this.media,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -33,55 +39,72 @@ class MoviePage extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
-                      Container(
-                        width: 70,
-                        height: 90,
-                        decoration: BoxDecoration(
-                          color: Colors.orange.shade200,
-                          borderRadius: BorderRadius.circular(12),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          "https://image.tmdb.org/t/p/w500${media.posterPath}",
+                          width: 120,
+                          height: 180,
+                          fit: BoxFit.cover,
                         ),
-                        child: const Icon(Icons.movie, size: 40),
                       ),
 
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 16),
 
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
 
-                          Text(
-                            "Dune: Part Two",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                            Text(
+                              media.title,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
 
-                          Text(
-                            "2024 • Sci-Fi, Adventure",
-                            style: TextStyle(color: Colors.white70),
-                          ),
+                            const SizedBox(height: 8),
 
-                          SizedBox(height: 5),
+                            Text(
+                              media.releaseDate,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                              ),
+                            ),
 
-                          Text(
-                            "⭐ 8.9 (12 453)",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      )
+                            const SizedBox(height: 4),
+
+                            Text(
+                              "⭐ ${media.rating.toStringAsFixed(1)}",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            Text(
+                              media.overview,
+                              maxLines: 6,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        )
+                      ),
                     ],
                   ),
 
                   const SizedBox(height: 12),
-
-                  const Text(
-                    "Paul Atreides une-se a Chani e aos Fremen enquanto procura vingança contra os conspiradores que destruíram a sua família.",
-                    style: TextStyle(color: Colors.white),
-                  )
                 ],
               ),
             ),

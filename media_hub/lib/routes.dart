@@ -8,6 +8,7 @@ import 'package:media_hub/login.dart';
 import 'package:media_hub/main_scaffold.dart';
 import 'package:media_hub/page_info.dart';
 import 'package:media_hub/register.dart';
+import 'package:media_hub/util/mediacard.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -77,7 +78,11 @@ final router = GoRouter(
     GoRoute(
       path: '/info',
       name: 'info',
-      builder: (context, state) => MoviePage(),
-    )
+      builder: (context, state) {
+        final media = state.extra as Media;
+
+        return MoviePage(media: media);
+      },
+    ),
   ],
 );

@@ -2,25 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class MediaCard extends StatelessWidget {
-  final String title;
-  final String type;
-  final double rating;
-  final IconData icon;
-  final Color color;
+  final Media media;
 
   const MediaCard({
     super.key,
-    required this.title,
-    required this.type,
-    required this.rating,
-    required this.icon,
-    required this.color,
+    required this.media,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/info'),
+      onTap: () {
+        context.push(
+          '/info',
+          extra: media,
+        );
+      },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 4,
@@ -31,26 +28,26 @@ class MediaCard extends StatelessWidget {
               height: 80,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: color, 
+                color: media.color, 
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
               ),
-              child: Icon(icon, color: Colors.white, size: 40),
+              child: Icon(media.icon, color: Colors.white, size: 40),
             ),
             Padding(
               padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold)), 
+                  Text(media.title, style: const TextStyle(fontWeight: FontWeight.bold)), 
                   
-                  Text(type, style: TextStyle(color: Theme.of(context).hintColor)), 
+                  Text(media.type, style: TextStyle(color: Theme.of(context).hintColor)), 
                   
                   const SizedBox(height: 4),
                   Row(
                     children: [
                       const Icon(Icons.star, size: 16, color: Colors.amber),
                       const SizedBox(width: 4),
-                      Text(rating.toString()), 
+                      Text(media.rating.toStringAsFixed(1)), 
                     ],
                   ),
                 ],
@@ -244,12 +241,29 @@ class TopicCard extends StatelessWidget {
   }
 }
 
+
 class Media {
+  final int id;
+
   final String title;
   final String type;
   final double rating;
   final IconData icon;
   final Color color;
 
-  Media(this.title, this.type, this.rating, this.icon, this.color);
+  final String overview;
+  final String posterPath;
+  final String releaseDate;
+
+  Media({
+    required this.id,
+    required this.title,
+    required this.type,
+    required this.rating,
+    required this.icon,
+    required this.color,
+    required this.overview,
+    required this.posterPath,
+    required this.releaseDate,
+  });
 }

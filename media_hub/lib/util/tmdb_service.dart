@@ -19,11 +19,16 @@ class TmdbService {
 
         return results.map((json) {
           return Media(
-            json['title'] ?? json['original_title'] ?? 'Sem Título',
-            'Movie',
-            (json['vote_average'] as num).toDouble(), 
-            Icons.movie, 
-            Colors.orange, 
+            id: json['id'],
+            title: json['title'] ?? '',
+            type: 'Movie',
+            rating: (json['vote_average'] as num).toDouble(),
+            icon: Icons.movie,
+            color: Colors.orange,
+
+            overview: json['overview'] ?? '',
+            posterPath: json['poster_path'] ?? '',
+            releaseDate: json['release_date'] ?? '',
           );
         }).toList();
       } else {

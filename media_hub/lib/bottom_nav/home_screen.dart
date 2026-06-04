@@ -11,24 +11,6 @@ class HomeScreen extends StatelessWidget {
     final tmdbService = TmdbService();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final List<Media> trendingList = [
-      Media('Dune: Part Two', 'Movie', 8.9, Icons.movie, Colors.orange),
-      Media('The Last of Us', 'Series', 9.2, Icons.tv, Colors.green),
-      Media('Project Hail Mary', 'Book', 9.1, Icons.book, Colors.purple),
-    ];
-
-    final List<Media> recommendedList = [
-      Media('The Batman', 'Movie', 8.5, Icons.movie, Colors.blue),
-      Media('Stranger Things', 'Series', 8.7, Icons.tv, Colors.red),
-      Media('The Midnight Library', 'Book', 8.8, Icons.book, Colors.teal),
-    ];
-
-    final List<Media> classifiedList = [
-      Media('Interstellar', 'Movie', 8.8, Icons.movie, Colors.brown),
-      Media('Breaking Bad', 'Series', 9.5, Icons.tv, Colors.indigo),
-      Media('Sapiens', 'Book', 9.0, Icons.book, Colors.cyan),
-    ];
-
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -107,11 +89,7 @@ class HomeScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final media = trendingList[index];
           return MediaCard(
-            title: media.title,
-            type: media.type,
-            rating: double.parse(media.rating.toStringAsFixed(1)),
-            icon: media.icon,
-            color: media.color,
+            media: media,
           );
         },
       );
@@ -136,6 +114,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
 
+            /*
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -152,7 +131,7 @@ class HomeScreen extends StatelessWidget {
                 );
               },
             ),
-
+            */
             Padding(
               padding: EdgeInsets.only(
                 left: 16.0,
@@ -168,7 +147,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-
+/*
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -184,7 +163,7 @@ class HomeScreen extends StatelessWidget {
                   color: media.color,
                 );
               },
-            ),
+            ),*/
             const SizedBox(height: 20),
           ],
         ),
