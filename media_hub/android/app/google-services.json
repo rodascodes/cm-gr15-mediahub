@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "382178034614",
+    "project_id": "mediahub-eea2e",
+    "storage_bucket": "mediahub-eea2e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:382178034614:android:1729a6d3365dd7eac97717",
+        "android_client_info": {
+          "package_name": "com.example.media_hub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAcCeYiUBnwYgGp-J-QpHUJ3b9JYduzzg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

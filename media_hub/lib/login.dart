@@ -5,7 +5,10 @@ import '../util/text_fields.dart';
 import '../util/app_validators.dart';
 
 class _LoginFields extends StatelessWidget {
-  const _LoginFields();
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+  
+  const _LoginFields({required this.emailController, required this.passwordController});
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +26,7 @@ class _LoginFields extends StatelessWidget {
         const SizedBox(height: 32),
 
         TextFields(
+          controller: emailController,
           hintText: 'Email',
           prefixIcon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
@@ -32,6 +36,7 @@ class _LoginFields extends StatelessWidget {
         const SizedBox(height: 16),
 
         TextFields(
+          controller: passwordController,
           hintText: 'Password',
           prefixIcon: Icons.lock_outlined,
           isPassword: true,
@@ -45,6 +50,7 @@ class _LoginFields extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 16.0),
           child: ElevatedButton(
             onPressed: () {
+              //TODO: tomorrow gotta change this to call the login method from the services.dart
               if (Form.of(context).validate()) {
                 context.go('/home');
               }
@@ -77,12 +83,18 @@ class _LoginForm extends StatefulWidget {
 class _LoginFormState extends State<_LoginForm> {
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
 
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _loginFormKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      child: const _LoginFields(), 
+      child: _LoginFields(
+        emailController: _emailController,
+        passwordController: _passwordController,
+      ),
     );
   }
 }
