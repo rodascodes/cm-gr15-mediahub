@@ -65,10 +65,8 @@ class _Header extends StatelessWidget {
               GestureDetector(
                 child: Icon(Icons.settings, color: Colors.white),
                 onTap: () {
-                  AuthService().logout();
-                  context.go('/login');
+                  print("TODO: Implement settings functionality");
                 },
-                //TODO: FOR NOW THIS LOGS OUT
               ),
             ],
           ),
@@ -256,6 +254,21 @@ class _FavouritesDisplay extends StatelessWidget{
   }
 }
 
+class _LogoutButton extends StatelessWidget {
+  const _LogoutButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {
+        AuthService().logout();
+        context.go('/login');
+      },
+      child: Text("Logout"),
+    );
+  }
+}
+
 class ProfileScreen extends StatelessWidget{
   const ProfileScreen({super.key});
 
@@ -269,6 +282,7 @@ class ProfileScreen extends StatelessWidget{
             _CategorySection(),
             _Ratings(),
             _FavouritesDisplay(),
+            _LogoutButton(),
           ],
         ),
       ),
