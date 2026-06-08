@@ -8,6 +8,7 @@ import 'package:media_hub/login.dart';
 import 'package:media_hub/main_scaffold.dart';
 import 'package:media_hub/page_info.dart';
 import 'package:media_hub/register.dart';
+import 'package:media_hub/services/auth_service.dart';
 import 'package:media_hub/util/mediacard.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -15,7 +16,7 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: '/login',
+  initialLocation: AuthService().currentUser == null ? '/login' : '/home',
   routes: [
     ShellRoute(
       navigatorKey: _shellNavigatorKey,

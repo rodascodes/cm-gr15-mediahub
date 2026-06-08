@@ -3,6 +3,7 @@ import 'package:media_hub/main.dart';
 import 'package:go_router/go_router.dart';
 import '../util/text_fields.dart'; 
 import '../util/app_validators.dart';
+import '../services/auth_service.dart';
 
 class _LoginFields extends StatelessWidget {
   final TextEditingController emailController;
@@ -49,11 +50,20 @@ class _LoginFields extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 16.0),
           child: ElevatedButton(
-            onPressed: () {
-              //TODO: tomorrow gotta change this to call the login method from the services.dart
+            onPressed: () async {
               if (Form.of(context).validate()) {
-                context.go('/home');
+                try {
+                  await AuthService().login(emailController.text, passwordController.text);
+                  if(!context.mounted) return; //if this widget was for some reason removed from the widget tree, returns. this can happen if the widget has been disposed during the async operation (putting this here avoids warnings)
+                  context.go('/home');
+                }
+                catch (e)
+                {
+                  if(!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login error: $e')));
+                }
               }
+              
             },
             child: const Text('Login'),
           ),

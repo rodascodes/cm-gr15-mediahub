@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:media_hub/services/auth_service.dart';
 import 'package:media_hub/util/app_colors.dart';
 import 'package:go_router/go_router.dart';
 
@@ -61,7 +62,14 @@ class _Header extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(_MockupUser.name, style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-              Icon(Icons.settings, color: Colors.white),
+              GestureDetector(
+                child: Icon(Icons.settings, color: Colors.white),
+                onTap: () {
+                  AuthService().logout();
+                  context.go('/login');
+                },
+                //TODO: FOR NOW THIS LOGS OUT
+              ),
             ],
           ),
           Text("@${_MockupUser.username}", style: TextStyle(color: Colors.white70)),

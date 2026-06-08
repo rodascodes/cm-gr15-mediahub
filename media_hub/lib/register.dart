@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:media_hub/main.dart';
+import 'package:media_hub/services/auth_service.dart';
 import '../util/text_fields.dart';
 import '../util/app_validators.dart';
 
 class _RegisterFields extends StatelessWidget {
+  final TextEditingController usernameController;
+  final TextEditingController nameController;
+  final TextEditingController emailController;
   final TextEditingController passwordController;
-  const _RegisterFields({required this.passwordController});
+  const _RegisterFields({required this.usernameController, required this.nameController, required this.emailController, required this.passwordController});
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +29,7 @@ class _RegisterFields extends StatelessWidget {
 
         TextFields(
           hintText: 'Username',
+          controller: usernameController,
           prefixIcon: Icons.person_outline,
           validator: AppValidators.validateUsername,
         ),
@@ -32,7 +37,16 @@ class _RegisterFields extends StatelessWidget {
         const SizedBox(height: 16),
 
         TextFields(
+          hintText: 'Name (optional)',
+          controller: nameController,
+          prefixIcon: Icons.badge_outlined,
+        ),
+
+        const SizedBox(height: 16),
+
+        TextFields(
           hintText: 'Email',
+          controller: emailController,
           prefixIcon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
           validator: AppValidators.validateEmail,
@@ -62,10 +76,19 @@ class _RegisterFields extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 16.0),
           child: ElevatedButton(
-            onPressed: () { 
+            onPressed: () async { 
 
               if (Form.of(context).validate()) {
-                context.go('/home');
+                try {
+                  await AuthService().register(usernameController.text, nameController.text, emailController.text, passwordController.text);
+                  if(!context.mounted) return; //if this widget was for some reason removed from the widget tree, returns. this can happen if the widget has been disposed during the async operation (putting this here avoids warnings)
+                  context.go('/home');
+                }
+                catch (e)
+                {
+                  if(!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Registration error: $e')));
+                }
               }
             },
             child: const Text('Register'),
@@ -95,6 +118,9 @@ class _RegisterForm extends StatefulWidget {
 class _RegisterFormState extends State<_RegisterForm> {
 
   final GlobalKey<FormState> _registerFormKey = GlobalKey<FormState>();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
@@ -108,7 +134,7 @@ class _RegisterFormState extends State<_RegisterForm> {
     return Form(
       key: _registerFormKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      child: _RegisterFields(passwordController: _passwordController), 
+      child: _RegisterFields(usernameController: _usernameController, nameController: _nameController, emailController: _emailController, passwordController: _passwordController), 
     );
   }
 }
