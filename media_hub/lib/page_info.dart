@@ -4,6 +4,7 @@ import 'package:media_hub/util/mediacard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:media_hub/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:media_hub/services/notification_service.dart';
 
 
 class MovieComment {
@@ -81,6 +82,11 @@ class _MoviePageState extends State<MoviePage> {
     setState(() {
       selectedRating = rating;
     });
+
+    await NotificationService.showNotification(
+      title: 'Avaliação Guardada',
+      body: 'A sua nota para ${widget.media.title} foi guardada.',
+  );
   }
 
 
@@ -107,6 +113,7 @@ class _MoviePageState extends State<MoviePage> {
 
 
   void addComment() {
+    print("ENTREI NO ADD COMMENT");
     if (_commentController.text.trim().isEmpty) return;
 
     setState(() {
@@ -122,6 +129,11 @@ class _MoviePageState extends State<MoviePage> {
     });
 
     _commentController.clear();
+
+    NotificationService.showNotification(
+      title: 'Comentário Enviado',
+      body: 'O seu comentário foi adicionado com sucesso.',
+  );
   }
 
 
