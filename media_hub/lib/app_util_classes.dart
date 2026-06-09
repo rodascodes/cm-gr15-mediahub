@@ -9,7 +9,7 @@ enum MediaType {
 }
 
 class MediaStats {
-  final String id;
+  final int id;
   final int score;
   final bool favorite;
   final DateTime? addedAt;
@@ -26,7 +26,7 @@ class MediaStats {
     this.durationMinutes,
   });
 
-  factory MediaStats.fromFirestore(String id, Map<String, dynamic> data) {
+  factory MediaStats.fromFirestore(int id, Map<String, dynamic> data) {
     return MediaStats(
       id: id,
       score: data['score'] ?? 0,
