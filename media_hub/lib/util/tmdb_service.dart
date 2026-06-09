@@ -89,6 +89,7 @@ class TmdbService {
         // First 4 most discussed items
         return results.take(4).map((json) {
           return DiscussedItem(
+            id: json['id'],
             title: json['title'] ?? json['original_title'] ?? 'Sem Título',
             comments: json['vote_count'] ?? 0, // Votes used as comments
             rating: (json['vote_average'] as num).toDouble(),

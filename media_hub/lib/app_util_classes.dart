@@ -8,7 +8,7 @@ enum MediaType {
   videogames,
 }
 
-class Media {
+class MediaStats {
   final String id;
   final int score;
   final bool favorite;
@@ -17,7 +17,7 @@ class Media {
   // optional duration in minutes (may be null if not available in Firestore)
   final int? durationMinutes;
 
-  Media({
+  MediaStats({
     required this.id,
     required this.score,
     required this.favorite,
@@ -26,15 +26,15 @@ class Media {
     this.durationMinutes,
   });
 
-  factory Media.fromFirestore(String id, Map<String, dynamic> data) {
-    return Media(
+  factory MediaStats.fromFirestore(String id, Map<String, dynamic> data) {
+    return MediaStats(
       id: id,
       score: data['score'] ?? 0,
       favorite: data['favorite'] ?? false,
       addedAt: data['completedAt'] != null
           ? (data['completedAt'] as Timestamp).toDate()
           : null,
-      mediaType: (data['mediaType'] ?? 'Unknow'),
+      mediaType: (data['mediaType'] ?? 'Unknown'),
       // try common keys for runtime/duration if stored in Firestore
       durationMinutes: (data['durationMinutes'] as int?) ?? (data['runtime'] as int?),
     );
@@ -44,14 +44,14 @@ class Media {
 class AppUser {
   final String name;
   final String username;
-  Map<MediaType, Map<String, Media>> media; //all the media the user has consumed
+  Map<MediaType, Map<String, MediaStats>> media; //all the media the user has consumed
   UserStats stats;
 
 
 
   AppUser({required this.name, required this.username, required this.media}) : stats = getStats(media);
 
-  static UserStats getStats(Map<MediaType, Map<String, Media>> media)
+  static UserStats getStats(Map<MediaType, Map<String, MediaStats>> media)
   {
     final ratings = {
       for (var i = 10; i >= 1; i--) i: 0,
@@ -59,7 +59,7 @@ class AppUser {
 
     int totalMedia = 0;
     double totalRating = 0;
-    List<Media> favs = [];
+    List<MediaStats> favs = [];
 
     for (final mediaByType in media.values)
     {
@@ -108,7 +108,7 @@ class UserStats{
   final Map<int, int> ratings;
   final double average;
   final int totalMedia;
-  final List<Media> favorites;
+  final List<MediaStats> favorites;
   // Total watched/listened/played time in whole hours
   final int totalHours;
   // Average length (minutes) of the media the user has consumed. 0 if unknown.

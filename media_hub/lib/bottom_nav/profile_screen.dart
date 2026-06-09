@@ -291,7 +291,7 @@ class _FavouritesDisplay extends StatelessWidget{
   {
     return Column(
       children: [
-        for(Media m in user.stats.favorites)
+        for(MediaStats m in user.stats.favorites)
           _Favourite(title: m.id, mediaType: m.mediaType, rating: m.score)
       ],
     );

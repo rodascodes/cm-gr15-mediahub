@@ -7,6 +7,7 @@ import '../main.dart';
 // ─── Data models ────────────────────────────────────────────────────────────
 
 class DiscussedItem {
+  final int id;
   final String title;
   final int comments;
   final double rating;
@@ -14,6 +15,7 @@ class DiscussedItem {
   final String imageUrl;
 
   const DiscussedItem({
+    required this.id,
     required this.title,
     required this.comments,
     required this.rating,
@@ -139,9 +141,8 @@ class ForumPage extends StatelessWidget {
               ),
             ),
 
-            // O FUTURE BUILDER DOS MAIS DISCUTIDOS!
 FutureBuilder<List<DiscussedItem>>(
-  future: tmdbService.getMostDiscussed(), // Chama a nova função!
+  future: tmdbService.getMostDiscussed(),
   builder: (context, snapshot) {
     if (snapshot.connectionState == ConnectionState.waiting) {
       return const Center(
@@ -167,12 +168,16 @@ FutureBuilder<List<DiscussedItem>>(
         itemBuilder: (context, index) {
           final item = items[index];
           
-          return HorizontalMediaCard(
-            title: item.title,
-            type: '${item.comments} comentários', 
-            // Arredonda o rating para 1 casa decimal
-            rating: double.parse(item.rating.toStringAsFixed(1)), 
+          final adaptedMedia = Media(
+            id: item.id, 
+            title: item.title, 
             imageUrl: item.imageUrl,
+            type: '${item.comments} comentários', 
+            rating: item.rating, 
+            overview: '', posterPath: '', releaseDate: ''
+          );
+          return HorizontalMediaCard(
+            media: adaptedMedia,
           );
         },
       );

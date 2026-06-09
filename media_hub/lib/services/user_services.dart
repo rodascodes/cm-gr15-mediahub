@@ -10,15 +10,15 @@ class UserServices {
     final userDoc = await _db.collection('users').doc(uid).get();
     final data = userDoc.data()!;
 
-    final media = <MediaType, Map<String, Media>>{};
+    final media = <MediaType, Map<String, MediaStats>>{};
 
     //inner helper to load one collection (ex: movies)
-    Future<Map<String, Media>> loadCollection(String path) async {
+    Future<Map<String, MediaStats>> loadCollection(String path) async {
       final snapshot = await _db.collection('users').doc(uid).collection(path).get();
 
       return {
         for (final doc in snapshot.docs)
-          doc.id: Media.fromFirestore(doc.id, doc.data()),
+          doc.id: MediaStats.fromFirestore(doc.id, doc.data()),
       };
     }
 
@@ -41,7 +41,7 @@ class UserServices {
   }
 
   //adds a movie to the users profile document in firestore
-  Future<void> addMovie(Media movie) async {
+  Future<void> addMovie(MediaStats movie) async {
     final uid = AuthService().currentUid;
     await _db
         .collection('users')
