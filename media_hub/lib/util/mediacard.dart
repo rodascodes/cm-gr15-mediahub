@@ -28,10 +28,12 @@ class MediaCard extends StatelessWidget {
               height: 80,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: media.color, 
+                image: DecorationImage(
+                  image: NetworkImage(media.imageUrl),
+                  fit: BoxFit.cover,
+                ),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
               ),
-              child: Icon(media.icon, color: Colors.white, size: 40),
             ),
             Padding(
               padding: const EdgeInsets.all(8),
@@ -64,16 +66,14 @@ class HorizontalMediaCard extends StatelessWidget {
   final String title;
   final String type;
   final double rating;
-  final IconData icon;
-  final Color color;
+  final String imageUrl;
 
   const HorizontalMediaCard({
     super.key,
     required this.title,
     required this.type,
     required this.rating,
-    required this.icon,
-    required this.color,
+    required this.imageUrl,
   });
 
   @override
@@ -92,10 +92,12 @@ class HorizontalMediaCard extends StatelessWidget {
             Container(
               width: 70, height: 70,
               decoration: BoxDecoration(
-                color: color, 
+                image: DecorationImage(
+                  image: NetworkImage(imageUrl),
+                  fit: BoxFit.cover,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, color: Colors.white, size: 32),
             ),
             const SizedBox(width: 16), 
             Expanded(
@@ -248,8 +250,7 @@ class Media {
   final String title;
   final String type;
   final double rating;
-  final IconData icon;
-  final Color color;
+  final String imageUrl;
 
   final String overview;
   final String posterPath;
@@ -260,8 +261,7 @@ class Media {
     required this.title,
     required this.type,
     required this.rating,
-    required this.icon,
-    required this.color,
+    required this.imageUrl,
     required this.overview,
     required this.posterPath,
     required this.releaseDate,

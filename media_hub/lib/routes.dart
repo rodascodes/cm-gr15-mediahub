@@ -43,7 +43,7 @@ final router = GoRouter(
                 (context, animation, secondaryAnimation, child) =>
                     FadeTransition(opacity: animation, child: child),
           ),
-        ),
+        ), 
         GoRoute(
           path: '/forum',
           name: 'forum',
@@ -53,7 +53,7 @@ final router = GoRouter(
                 (context, animation, secondaryAnimation, child) =>
                     FadeTransition(opacity: animation, child: child),
           ),
-        ),
+        ), 
         GoRoute(
           path: '/profile',
           name: 'profile',

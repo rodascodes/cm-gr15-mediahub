@@ -108,10 +108,8 @@ class _Header extends StatelessWidget {
               GestureDetector(
                 child: Icon(Icons.settings, color: Colors.white),
                 onTap: () {
-                  AuthService().logout();
-                  context.go('/login');
+                  print("TODO: Implement settings functionality");
                 },
-                //TODO: FOR NOW THIS LOGS OUT
               ),
             ],
           ),

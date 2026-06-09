@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:media_hub/util/app_colors.dart';
 import 'package:media_hub/util/mediacard.dart';
+import '../util/tmdb_service.dart';
 import '../main.dart';
 
 // ─── Data models ────────────────────────────────────────────────────────────
 
-class _DiscussedItem {
+class DiscussedItem {
   final String title;
   final int comments;
   final double rating;
   final IconData icon;
-  final Color color;
+  final String imageUrl;
 
-  const _DiscussedItem({
+  const DiscussedItem({
     required this.title,
     required this.comments,
     required this.rating,
     required this.icon,
-    required this.color,
+    required this.imageUrl,
   });
 }
 
@@ -42,31 +43,6 @@ class _ForumTopic {
 }
 
 // ─── Mock data ───────────────────────────────────────────────────────────────
-
-final List<_DiscussedItem> _mostDiscussed = [
-  _DiscussedItem(
-    title: 'Dune: Part Two',
-    comments: 1243,
-    rating: 8.9,
-    icon: Icons.movie,
-    color: Colors.orange,
-  ),
-  _DiscussedItem(
-    title: 'The Last of Us',
-    comments: 2156,
-    rating: 9.2,
-    icon: Icons.tv,
-    color: Colors.green,
-  ),
-  _DiscussedItem(
-    title: 'Atomic Habits',
-    comments: 876,
-    rating: 8.7,
-    icon: Icons.book,
-    color: Colors.purple,
-  ),
-];
-
 final List<_ForumTopic> _recentTopics = [
   _ForumTopic(
     title: 'Melhor filme de 2024?',
@@ -76,15 +52,6 @@ final List<_ForumTopic> _recentTopics = [
     timeAgo: '2h atrás',
     comments: 156,
     likes: 234,
-  ),
-  _ForumTopic(
-    title: 'Recomendações de sci-fi para iniciantes',
-    author: 'Rita Mendes',
-    category: 'Livros',
-    categoryColor: AppColors.primary,
-    timeAgo: '5h atrás',
-    comments: 89,
-    likes: 145,
   ),
   _ForumTopic(
     title: 'The Last of Us vs The Walking Dead',
@@ -112,6 +79,7 @@ class ForumPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tmdbService = TmdbService();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
@@ -171,23 +139,48 @@ class ForumPage extends StatelessWidget {
               ),
             ),
 
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _mostDiscussed.length,
-              itemBuilder: (context, index) {
-                final item = _mostDiscussed[index];
-
-                return HorizontalMediaCard(
-                  title: item.title,
-                  type: '${item.comments} comentários',
-                  rating: item.rating,
-                  icon: item.icon,
-                  color: item.color,
-                );
-              },
-            ),
+            // O FUTURE BUILDER DOS MAIS DISCUTIDOS!
+FutureBuilder<List<DiscussedItem>>(
+  future: tmdbService.getMostDiscussed(), // Chama a nova função!
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    } 
+    else if (snapshot.hasError) {
+      return Center(
+        child: Text('Erro: ${snapshot.error}', style: TextStyle(color: Theme.of(context).hintColor)),
+      );
+    } 
+    else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+      final items = snapshot.data!;
+      
+      return ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          final item = items[index];
+          
+          return HorizontalMediaCard(
+            title: item.title,
+            type: '${item.comments} comentários', 
+            // Arredonda o rating para 1 casa decimal
+            rating: double.parse(item.rating.toStringAsFixed(1)), 
+            imageUrl: item.imageUrl,
+          );
+        },
+      );
+    }
+    
+    return const SizedBox.shrink();
+  },
+),
             Padding(
               padding: const EdgeInsets.only(
                 left: 16,
@@ -238,3 +231,4 @@ class ForumPage extends StatelessWidget {
     );
   }
 }
+ 
