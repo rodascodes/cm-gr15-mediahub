@@ -3,6 +3,23 @@ import 'package:go_router/go_router.dart';
 import 'package:media_hub/util/mediacard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:media_hub/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+
+class MovieComment {
+  final String username;
+  final String comment;
+  final int? rating;
+  final DateTime date;
+
+  MovieComment({
+    required this.username,
+    required this.comment,
+    this.rating,
+    required this.date,
+  });
+}
+
 
 class MoviePage extends StatefulWidget {
   final Media media;
@@ -65,6 +82,50 @@ class _MoviePageState extends State<MoviePage> {
       selectedRating = rating;
     });
   }
+
+
+
+
+  final TextEditingController _commentController = TextEditingController();
+
+  List<MovieComment> comments = [
+    MovieComment(
+      username: "Pedro",
+      comment: "Obra-prima absoluta! A cinematografia é incrível.",
+      rating: 10,
+      date: DateTime.now().subtract(const Duration(hours: 2)),
+    ),
+
+    MovieComment(
+      username: "Joana",
+      comment: "Excelente continuação. Banda sonora fantástica.",
+      rating: 9,
+      date: DateTime.now().subtract(const Duration(days: 1)),
+    ),
+  ];
+
+
+
+  void addComment() {
+    if (_commentController.text.trim().isEmpty) return;
+
+    setState(() {
+      comments.insert(
+        0,
+        MovieComment(
+          username: FirebaseAuth.instance.currentUser?.displayName ?? FirebaseAuth.instance.currentUser?.email ?? "Utilizador",
+          comment: _commentController.text.trim(),
+          rating: selectedRating,
+          date: DateTime.now(),
+        ),
+      );
+    });
+
+    _commentController.clear();
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -225,48 +286,73 @@ class _MoviePageState extends State<MoviePage> {
 
                 const SizedBox(height: 12),
 
-                // COMMENT 1
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: const [
-                      CircleAvatar(child: Icon(Icons.person)),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          "Obra-prima absoluta! A cinematografia é de outro nível.",
-                        ),
-                      ),
-                      Text("⭐10")
-                    ],
-                  ),
-                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: comments.length,
+                  itemBuilder: (context, index) {
+                    final comment = comments[index];
 
-                const SizedBox(height: 10),
-
-                // COMMENT 2
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: const [
-                      CircleAvatar(child: Icon(Icons.person)),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          "Excelente continuação. A banda sonora é épica!",
-                        ),
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      Text("⭐9")
-                    ],
-                  ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          Row(
+                            children: [
+
+                              Expanded(
+                                child: Row(
+                                  children: [
+
+                                    Text(
+                                      comment.username,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+
+                                    if (comment.rating != null) ...[
+                                      const SizedBox(width: 8),
+
+                                      Text(
+                                        "⭐ ${comment.rating}",
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ]
+                                  ],
+                                ),
+                              ),
+
+                              Text(
+                                "${comment.date.day.toString().padLeft(2, '0')}/"
+                                "${comment.date.month.toString().padLeft(2, '0')}/"
+                                "${comment.date.year} "
+                                "${comment.date.hour.toString().padLeft(2, '0')}:"
+                                "${comment.date.minute.toString().padLeft(2, '0')}",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 8),
+
+                          Text(comment.comment),
+                        ],
+                      ),
+                    );
+                  },
                 ),
 
                 const SizedBox(height: 80), // espaço para o input
@@ -291,6 +377,7 @@ class _MoviePageState extends State<MoviePage> {
 
                 Expanded(
                   child: TextField(
+                    controller: _commentController,
                     decoration: InputDecoration(
                       hintText: "Adicione um comentário...",
                       filled: true,
@@ -306,9 +393,12 @@ class _MoviePageState extends State<MoviePage> {
 
                 const SizedBox(width: 10),
 
-                CircleAvatar(
-                  backgroundColor: Colors.purple,
-                  child: const Icon(Icons.send, color: Colors.white),
+                GestureDetector(
+                  onTap: addComment,
+                  child: const CircleAvatar(
+                    backgroundColor: Colors.purple,
+                    child: Icon(Icons.send, color: Colors.white),
+                  ),
                 )
               ],
             ),
