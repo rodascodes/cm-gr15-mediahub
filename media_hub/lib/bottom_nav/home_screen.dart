@@ -55,49 +55,48 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
 
-            FutureBuilder<List<Media>>(
-  future: tmdbService.getTrendingMovies(),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(20.0),
-          child: CircularProgressIndicator(),
-        ),
-      );
-    } 
-    else if (snapshot.hasError) {
-      return Center(
-        child: Text('Erro ao carregar filmes: ${snapshot.error}'),
-      );
-    } 
-    else if (snapshot.hasData) {
-      final trendingList = snapshot.data!;
-      
-      return GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(10),
+  FutureBuilder<List<Media>>(
+    future: tmdbService.getTrending('/movie'),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: CircularProgressIndicator(),
+          ),
+        );
+      } 
+      else if (snapshot.hasError) {
+        return Center(
+          child: Text('Erro ao carregar filmes: ${snapshot.error}'),
+        );
+      } 
+      else if (snapshot.hasData) {
+        final trendingList = snapshot.data!;
+        
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(10),
 
-        itemCount: trendingList.length > 4 ? 4 : trendingList.length, 
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: 0.75,
-        ),
-        itemBuilder: (context, index) {
-          final media = trendingList[index];
-          return MediaCard(
-            media: media,
-          );
-        },
-      );
-    }
-    
-    return const SizedBox.shrink(); 
-  },
-),
+          itemCount: trendingList.length > 4 ? 4 : trendingList.length, 
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 0.75,
+          ),
+          itemBuilder: (context, index) {
+            final media = trendingList[index];
+            return MediaCard(
+              media: media,
+            );
+          },
+        );
+      }
+      return const SizedBox.shrink(); 
+    },
+  ),
             Padding(
               padding: EdgeInsets.only(
                 left: 16.0,
@@ -113,25 +112,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-
-            /*
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(16),
-              itemCount: recommendedList.length,
-              itemBuilder: (context, index) {
-                final media = recommendedList[index];
-                return HorizontalMediaCard(
-                  title: media.title,
-                  type: media.type,
-                  rating: media.rating,
-                  icon: media.icon,
-                  color: media.color,
-                );
-              },
-            ),
-            */
             Padding(
               padding: EdgeInsets.only(
                 left: 16.0,
@@ -147,23 +127,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-/*
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(16),
-              itemCount: classifiedList.length,
-              itemBuilder: (context, index) {
-                final media = classifiedList[index];
-                return HorizontalMediaCard(
-                  title: media.title,
-                  type: media.type,
-                  rating: media.rating,
-                  icon: media.icon,
-                  color: media.color,
-                );
-              },
-            ),*/
             const SizedBox(height: 20),
           ],
         ),

@@ -1,83 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:media_hub/util/mediacard.dart';
-//import 'package:go_router/go_router.dart'; Irá ser implementado quando o Pedro mandar o código da página Info
+import '../util/tmdb_service.dart';
+import '../main.dart';
 
 
-class SearchPage extends StatelessWidget {
+class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
 
   @override
+  State<SearchPage> createState() => _SearchPageState();
+}
+
+class _SearchPageState extends State<SearchPage> {
+  late TextEditingController _searchController;
+  final tmdbService = TmdbService();
+  String _selectedCategory = 'All'; // Track selected category
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<List<Media>> _getMedia() async {
+    final query = _searchController.text.trim();
+    
+    // If search is empty, show trending based on category
+    if (query.isEmpty) {
+      if (_selectedCategory == 'Movies') {
+        return tmdbService.getTrending('/movie/');
+      } else if (_selectedCategory == 'Series') {
+        return tmdbService.getTrending('/tv/');
+      } else {
+        // For 'All', combine movies and TV
+        final movies = await tmdbService.getTrending('/movie/');
+        final tvShows = await tmdbService.getTrending('/tv/');
+        return [...movies, ...tvShows]; //Spread operator to combine lists
+      }
+    }
+    
+    // If search has text, search and filter by category
+    final results = await tmdbService.search(query);
+    if (_selectedCategory == 'Movies') {
+      return results.where((media) => media.type == 'Movie').toList();
+    } else if (_selectedCategory == 'Series') {
+      return results.where((media) => media.type == 'TV Show').toList();
+    }
+    return results;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final List<Media> searchList = [
-      Media(
-        id: 1,
-        title: 'Dune: Part Two',
-        type: 'Movie',
-        rating: 8.9,
-        icon: Icons.movie,
-        color: Colors.orange,
-        overview: '',
-        posterPath: '',
-        releaseDate: '2024',
-      ),
-      Media(
-        id: 2,
-        title: 'The Last of Us',
-        type: 'Series',
-        rating: 9.2,
-        icon: Icons.tv,
-        color: Colors.green,
-        overview: '',
-        posterPath: '',
-        releaseDate: '2023',
-      ),
-      Media(
-        id: 3,
-        title: 'Project Hail Mary',
-        type: 'Book',
-        rating: 9.1,
-        icon: Icons.book,
-        color: Colors.purple,
-        overview: '',
-        posterPath: '',
-        releaseDate: '2021',
-      ),
-      Media(
-        id: 4,
-        title: 'The Batman',
-        type: 'Movie',
-        rating: 8.5,
-        icon: Icons.movie,
-        color: Colors.blue,
-        overview: '',
-        posterPath: '',
-        releaseDate: '2022',
-      ),
-      Media(
-        id: 5,
-        title: 'Stranger Things',
-        type: 'Series',
-        rating: 8.7,
-        icon: Icons.tv,
-        color: Colors.red,
-        overview: '',
-        posterPath: '',
-        releaseDate: '2016',
-      ),
-      Media(
-        id: 6,
-        title: 'The Midnight Library',
-        type: 'Book',
-        rating: 8.8,
-        icon: Icons.book,
-        color: Colors.teal,
-        overview: '',
-        posterPath: '',
-        releaseDate: '2020',
-      ),
-    ];
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+            onPressed: () {
+              themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
+            },
+          ),
+        ],
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -97,6 +87,10 @@ class SearchPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: TextField(
+                controller: _searchController,
+                onChanged: (value) {
+                  setState(() {});
+                },
                 decoration: InputDecoration(
                   hintText: 'Search for movies, series, books...',
                   prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -122,53 +116,84 @@ class SearchPage extends StatelessWidget {
                   CategoryButton(
                     text: "All",
                     colors: const [Color(0xFFB066FE), Color(0xFFE943AD)],
-                    onPressed: null,
+                    isSelected: _selectedCategory == 'All',
+                    onPressed: () {
+                      setState(() {
+                        _selectedCategory = 'All';
+                      });
+                    },
                   ),
                   const SizedBox(width: 8),
 
                   CategoryButton(
                     text: "Movies",
                     colors: const [Color(0xFF3399FF), Color(0xFF00B4DB)],
-                    onPressed: null,
+                    isSelected: _selectedCategory == 'Movies',
+                    onPressed: () {
+                      setState(() {
+                        _selectedCategory = 'Movies';
+                      });
+                    },
                   ),
                   const SizedBox(width: 8),
 
                   CategoryButton(
                     text: "Series",
                     colors: const [Color(0xFF20E2D7), Color(0xFF00C896)],
-                    onPressed: null,
-                  ),
-                  const SizedBox(width: 8),
-
-                  CategoryButton(
-                    text: "Books",
-                    colors: const [Color(0xFFFF8008), Color(0xFFFF4B2B)],
-                    onPressed: null,
+                    isSelected: _selectedCategory == 'Series',
+                    onPressed: () {
+                      setState(() {
+                        _selectedCategory = 'Series';
+                      });
+                    },
                   ),
                   const SizedBox(width: 8),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              itemCount: searchList.length,
-              itemBuilder: (context, index) {
-                final media = searchList[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: HorizontalMediaCard(
-                    title: media.title,
-                    type: media.type,
-                    rating: media.rating,
-                    icon: media.icon,
-                    color: media.color,
-                  ),
-                );
-              },
-            ),
+  FutureBuilder<List<Media>>(
+    future: _getMedia(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: CircularProgressIndicator(),
+          ),
+        );
+      } 
+      else if (snapshot.hasError) {
+        return Center(
+          child: Text('Erro ao carregar filmes: ${snapshot.error}'),
+        );
+      } 
+      else if (snapshot.hasData) {
+        final searchResults = snapshot.data!;
+        
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(10),
+
+          itemCount: searchResults.length, 
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 0.75,
+          ),
+          itemBuilder: (context, index) {
+            final media = searchResults[index];
+            return MediaCard(
+              media: media,
+            );
+          },
+        );
+      }
+      return const SizedBox.shrink(); 
+    },
+  ),
           ],
         ),
       ),
@@ -180,32 +205,38 @@ class CategoryButton extends StatelessWidget {
   final String text;
   final List<Color> colors;
   final VoidCallback? onPressed;
+  final bool isSelected;
 
   const CategoryButton({
     super.key,
     required this.text,
     required this.colors,
     this.onPressed,
+    this.isSelected = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: colors,
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
+        gradient: isSelected 
+          ? LinearGradient(
+              colors: colors,
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            )
+          : null,
+        border: !isSelected 
+          ? Border.all(color: Colors.grey[400]!, width: 2)
+          : null,
         borderRadius: BorderRadius.circular(20),
       ),
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              Colors.transparent, 
+          backgroundColor: isSelected ? Colors.transparent : Colors.transparent,
           shadowColor: Colors.transparent, 
-          foregroundColor: Colors.white,
+          foregroundColor: isSelected ? Colors.white : Colors.grey[600],
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -213,7 +244,11 @@ class CategoryButton extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),
+          style: TextStyle(
+            fontWeight: FontWeight.bold, 
+            fontSize: 15, 
+            color: isSelected ? Colors.white : Colors.grey[600],
+          ),
         ),
       ),
     );
