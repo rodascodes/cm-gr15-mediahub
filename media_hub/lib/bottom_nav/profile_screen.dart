@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:media_hub/app_util_classes.dart';
 import 'package:media_hub/services/auth_service.dart';
+import 'package:media_hub/services/user_services.dart';
 import 'package:media_hub/util/app_colors.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,6 +13,45 @@ class _MockupUser {
   static int hours = 156;
   static int top = 5;
   static Map<String, int> mediaTypes = {"Movies" : 89, "TV Shows" : 124, "Books" : 34};
+}
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      body: FutureBuilder<AppUser>(
+        future: UserServices().getUser(),
+        builder: (context, snapshot) {
+
+          //loading stuff
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          //error
+          if (snapshot.hasError || !snapshot.hasData) {
+            return const Center(child: Text("Error loading user"));
+          }
+
+          //pog
+          final user = snapshot.data!;
+
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                _Header(user: user),
+                _CategorySection(user: user),
+                _Ratings(user: user),
+                _FavouritesDisplay(user: user),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
 //stat cards to be used on header with information about user ratings , average rating, etc
@@ -41,7 +82,9 @@ class _StatCard extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header();
+  final AppUser user;
+  
+  const _Header({required this.user});
 
   @override
   Widget build(BuildContext context)
@@ -61,7 +104,7 @@ class _Header extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(_MockupUser.name, style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+              Text(user.name, style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
               GestureDetector(
                 child: Icon(Icons.settings, color: Colors.white),
                 onTap: () {
@@ -72,13 +115,13 @@ class _Header extends StatelessWidget {
               ),
             ],
           ),
-          Text("@${_MockupUser.username}", style: TextStyle(color: Colors.white70)),
+          Text("@${user.username}", style: TextStyle(color: Colors.white70)),
           SizedBox(height: 16), //just to give an empty space before inserting the row with the stat cards
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _StatCard(value: "${_MockupUser.ratings}", stat: "Ratings"),
-              _StatCard(value: "${_MockupUser.average}", stat: "Avg. Score"),
+              _StatCard(value: "${user.stats.totalMedia}", stat: "Ratings"),
+              _StatCard(value: "${user.stats.average}", stat: "Avg. Score"),
               _StatCard(value: "${_MockupUser.hours}h", stat: "Time"),
               _StatCard(value: "Top ${_MockupUser.top}%", stat: ""),
             ],
@@ -120,11 +163,13 @@ class _CategoryCard extends StatelessWidget{
 
 class _CategorySection extends StatelessWidget{
   static const Map<String, IconData> icons = {
-    "Movies": Icons.movie,
-    "TV Shows": Icons.tv,
-    "Books": Icons.book,
+    "movies": Icons.movie,
+    "tv shows": Icons.tv,
+    "books": Icons.book,
   };
-  const _CategorySection();
+
+  final AppUser user;
+  const _CategorySection({required this.user});
 
   @override
   Widget build(BuildContext context)
@@ -136,13 +181,18 @@ class _CategorySection extends StatelessWidget{
         children: [
           Text("Categories", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           SizedBox(height: 12), //to give some space
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              for(String mediaType in _MockupUser.mediaTypes.keys)
-                _CategoryCard(icon: icons[mediaType] ?? Icons.help, mediaType: mediaType, numberWatched: _MockupUser.mediaTypes[mediaType] ?? 0) //in flutter ?? means if there is not any then do this instead
-            ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child:
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                for(MediaType mediaType in user.media.keys)
+                  _CategoryCard(icon: icons[mediaType.name] ?? Icons.help, mediaType: mediaType.name, numberWatched: user.media[mediaType]?.length ?? 0) //in flutter ?? means if there is not any then do this instead
+              ],
+            ),
           ),
+          
         ],
       ),
     );
@@ -179,7 +229,8 @@ class _RatingRow extends StatelessWidget{
 }
 
 class _Ratings extends StatelessWidget{
-  const _Ratings();
+  final AppUser user;
+  const _Ratings({required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -187,12 +238,20 @@ class _Ratings extends StatelessWidget{
       padding: EdgeInsets.all(16),
       child: Column(
         children: [
+          for (int i in user.stats.ratings.keys)
+            for (var count in [user.stats.ratings[i]])
+              //this is the only safe way for it not to complain
+              if (count is int && count >= 1)
+                _RatingRow(rating: i, count: count),
+                  
+          /*
           _RatingRow(rating: 10, count: 45),
           _RatingRow(rating: 9, count: 62),
           _RatingRow(rating: 8, count: 71),
           _RatingRow(rating: 7, count: 38),
           _RatingRow(rating: 6, count: 19),
           _RatingRow(rating: 5, count: 12),
+          */
         ],
       ),
     );
@@ -241,37 +300,20 @@ class _Favourite extends StatelessWidget{
 }
 
 class _FavouritesDisplay extends StatelessWidget{
-  const _FavouritesDisplay();
+  final AppUser user;
+  const _FavouritesDisplay({required this.user});
 
   @override
   Widget build(BuildContext context)
   {
     return Column(
       children: [
-        _Favourite(title: "El Projeto Ave Maria", mediaType: "Movie", rating: 10),
+        for(Media m in user.stats.favorites)
+          _Favourite(title: m.id, mediaType: m.mediaType, rating: m.score)
+        /*_Favourite(title: "El Projeto Ave Maria", mediaType: "Movie", rating: 10),
         _Favourite(title: "El Projeto Ave Maria 2", mediaType: "Movie", rating: 10),
-        _Favourite(title: "El Projeto Ave Maria: El Seriado de Netflix", mediaType: "Tv Show", rating: 10),
+        _Favourite(title: "El Projeto Ave Maria: El Seriado de Netflix", mediaType: "Tv Show", rating: 10),*/
       ],
-    );
-  }
-}
-
-class ProfileScreen extends StatelessWidget{
-  const ProfileScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _Header(),
-            _CategorySection(),
-            _Ratings(),
-            _FavouritesDisplay(),
-          ],
-        ),
-      ),
     );
   }
 }

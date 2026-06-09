@@ -22,13 +22,15 @@ class AuthService {
       'name': name.trim().isEmpty ? username : name,
       'email': email,
       'createdAt': Timestamp.now(), //might also be useful to save when a user was created (for displaying account age in profile if it is later desired)
+      'collections': ['movies'],
     });
 
     //TODO: THIS IS JUST FOR TESTING PURPOSES! IT HAS TO BE REMOVED IN THE FUTURE!
-    await FirebaseFirestore.instance.collection('users').doc(credential.user!.uid).collection('Movies').doc('movieId1').set({
+    await FirebaseFirestore.instance.collection('users').doc(credential.user!.uid).collection('movies').doc('movieId1').set({
       'score': 5,
       'favorite': true,
       'completedAt': Timestamp.now(),
+      'mediaType': 'Movies',
     });
 
     return credential;
