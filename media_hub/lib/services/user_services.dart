@@ -42,24 +42,6 @@ class UserServices {
     );
   }
 
-  //adds a movie to the users profile document in firestore
-  Future<void> addMovie(MediaStats movie) async {
-    final uid = AuthService().currentUid;
-
-    await _db.collection('users').doc(uid).update({
-      'collections': FieldValue.arrayUnion(['movies']),
-    });
-
-    await _db
-        .collection('users')
-        .doc(uid)
-        .collection('movies')
-        .doc(movie.id.toString())
-        .set({
-      'score': movie.score,
-      'favorite': movie.favorite,
-      'addedAt': Timestamp.now(),
-      'mediaType': 'Movies',
-    }, SetOptions(merge: true));
-  }
+  //removed what was here because since the things were all coded the way they were, this just didn't make sense anymore.
+  //a refactoring would be perfect for this spaghetti code, but there's not enough time
 }

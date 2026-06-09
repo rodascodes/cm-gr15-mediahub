@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:media_hub/app_util_classes.dart';
 import 'package:media_hub/util/mediacard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:media_hub/services/auth_service.dart';
@@ -75,23 +74,34 @@ class _MoviePageState extends State<MoviePage> {
 
     if (uid == null) return;
 
+    String type = widget.media.type.toLowerCase();
+    if(type.startsWith("t") && type.length >= 3)
+    {
+      //because the way the media cards are coded the type can be stored as "Tv"; "Tv Show"; or even "Tv Show 3489 comments", and this breaks the programs flow when consulting firestore
+      type = type.substring(0, 2).trim();
+    }
+    else if(type.startsWith('m') && type.length >= 6)
+    {
+      type = type.substring(0, 5);
+    }
+
     await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
         .set({
-        'collections': FieldValue.arrayUnion(['${widget.media.type.toLowerCase()}'])
+        'collections': FieldValue.arrayUnion(['$type'])
     }, SetOptions(merge: true));
 
     await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
-        .collection(widget.media.type.toLowerCase())
+        .collection(type)
         .doc(widget.media.id.toString())
         .set({
       'score': rating,
       'favorite': favorite,
       'updatedAt': Timestamp.now(),
-      'mediaType': widget.media.type.toLowerCase(),
+      'mediaType': type,
       //'collections': FieldValue.arrayUnion(['${widget.media.type}']),
     }, SetOptions(merge: true));
 
@@ -141,25 +151,38 @@ class _MoviePageState extends State<MoviePage> {
 
     if (uid == null) return;
 
+    String type = widget.media.type.toLowerCase();
+    if(type.startsWith("t") && type.length >= 3)
+    {
+      //because the way the media cards are coded the type can be stored as "Tv"; "Tv Show"; or even "Tv Show 3489 comments", and this breaks the programs flow when consulting firestore
+      type = type.substring(0, 2).trim();
+    }
+    else if(type.startsWith('m') && type.length >= 6)
+    {
+      type = type.substring(0, 5);
+    }
+
+
+
     bool isFavorite = !favorite!;
 
     await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
         .set({
-        'collections': FieldValue.arrayUnion(['${widget.media.type.toLowerCase()}'])
+        'collections': FieldValue.arrayUnion(['$type'])
     }, SetOptions(merge: true));
 
     await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
-        .collection(widget.media.type.toLowerCase())
+        .collection(type)
         .doc(widget.media.id.toString())
         .set({
       'score': selectedRating,
       'favorite': isFavorite,
       'updatedAt': Timestamp.now(),
-      'mediaType': widget.media.type.toLowerCase(),
+      'mediaType': type,
     }, SetOptions(merge: true));
 
     setState(() {
@@ -196,7 +219,6 @@ class _MoviePageState extends State<MoviePage> {
 
 
   void addComment() {
-    print("ENTREI NO ADD COMMENT");
     if (_commentController.text.trim().isEmpty) return;
 
     setState(() {
