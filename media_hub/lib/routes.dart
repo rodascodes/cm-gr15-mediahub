@@ -10,6 +10,7 @@ import 'package:media_hub/page_info.dart';
 import 'package:media_hub/register.dart';
 import 'package:media_hub/services/auth_service.dart';
 import 'package:media_hub/util/mediacard.dart';
+import 'package:media_hub/profile_pages/media_collection_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -83,6 +84,18 @@ final router = GoRouter(
         final media = state.extra as Media;
 
         return MoviePage(media: media);
+      },
+    ),
+
+    GoRoute(
+      path: '/collection',
+      builder: (context, state) {
+        final data = state.extra as Map<String, dynamic>;
+
+        return MediaCollectionPage(
+          title: data['title'],
+          items: data['items'],
+        );
       },
     ),
   ],

@@ -62,11 +62,8 @@ O app oferece:
 ## Instalação
 
 1. Instale o Flutter e configure o SDK: https://flutter.dev/docs/get-started/install
-2. Abra o terminal na pasta do projeto:
-   ```bash
-   cd "c:\Users\pedro\OneDrive\Ambiente de Trabalho\IPS\2ºano\POO\PROJETO\cm-gr15-mediahub\media_hub"
-   ```
-3. Instale as dependências:
+   
+2. Instale as dependências:
    ```bash
    flutter pub get
    ```

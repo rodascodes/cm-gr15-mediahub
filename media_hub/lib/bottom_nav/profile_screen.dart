@@ -129,30 +129,47 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _CategoryCard extends StatelessWidget{
+class _CategoryCard extends StatelessWidget {
   final IconData icon;
   final String mediaType;
   final int numberWatched;
 
-  const _CategoryCard({required this.icon, required this.mediaType, required this.numberWatched});
+  const _CategoryCard({
+    required this.icon,
+    required this.mediaType,
+    required this.numberWatched,
+  });
 
   @override
-  Widget build(BuildContext context)
-  {
-    return Container(
-      width: 100,
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: Colors.purple,),
-          SizedBox(height: 8,),
-          Text("$numberWatched", style: TextStyle(fontWeight: FontWeight.bold),),
-          Text(mediaType),
-        ],
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        context.push(
+          '/collection',
+          extra: {
+            "title": mediaType,
+            "items": <Map<String, dynamic>>[],
+          },
+        );
+      },
+      child: Container(
+        width: 100,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: Colors.purple),
+            const SizedBox(height: 8),
+            Text(
+              "$numberWatched",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text(mediaType),
+          ],
+        ),
       ),
     );
   }
