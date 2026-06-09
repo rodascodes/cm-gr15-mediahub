@@ -14,16 +14,29 @@ class Media {
   final bool favorite;
   final DateTime? addedAt;
   final String mediaType;
+  // optional duration in minutes (may be null if not available in Firestore)
+  final int? durationMinutes;
 
-  Media({required this.id, required this.score, required this.favorite, required this.addedAt, required this.mediaType});
+  Media({
+    required this.id,
+    required this.score,
+    required this.favorite,
+    required this.addedAt,
+    required this.mediaType,
+    this.durationMinutes,
+  });
 
   factory Media.fromFirestore(String id, Map<String, dynamic> data) {
     return Media(
       id: id,
       score: data['score'] ?? 0,
       favorite: data['favorite'] ?? false,
-      addedAt: (data['completedAt'] as Timestamp).toDate(),
+      addedAt: data['completedAt'] != null
+          ? (data['completedAt'] as Timestamp).toDate()
+          : null,
       mediaType: (data['mediaType'] ?? 'Unknow'),
+      // try common keys for runtime/duration if stored in Firestore
+      durationMinutes: (data['durationMinutes'] as int?) ?? (data['runtime'] as int?),
     );
   }
 }
@@ -59,9 +72,33 @@ class AppUser {
       }
     }
 
-    favs.sort((a, b) => b.score.compareTo(a.score)); //orders in descending order
+      favs.sort((a, b) => b.score.compareTo(a.score)); //orders in descending order
 
-    return UserStats(ratings: ratings, average: (totalRating.toDouble()/totalMedia), totalMedia: totalMedia, favorites: favs);
+      // compute duration stats if available
+      int totalMinutes = 0;
+      int knownDurations = 0;
+      for (final mediaByType in media.values) {
+        for (final item in mediaByType.values) {
+          if (item.durationMinutes != null) {
+            totalMinutes += item.durationMinutes!;
+            knownDurations++;
+          }
+        }
+      }
+
+      final int totalHours = totalMinutes ~/ 60;
+      final double averageLengthMinutes = knownDurations > 0 ? totalMinutes / knownDurations : 0.0; //if exists at least one media with known duration, compute average, otherwise 0
+
+      final double averageRating = totalMedia > 0 ? (totalRating.toDouble() / totalMedia) : 0.0; //if the user has rated at least one media, compute average, otherwise 0
+
+      return UserStats(
+        ratings: ratings,
+        average: averageRating,
+        totalMedia: totalMedia,
+        favorites: favs,
+        totalHours: totalHours,
+        averageLengthMinutes: averageLengthMinutes,
+      );
   }
 
 }
@@ -72,15 +109,17 @@ class UserStats{
   final double average;
   final int totalMedia;
   final List<Media> favorites;
-  //final int totalHours;
-  //final int top;
-  //TODO: para estas comentadas funcionarem é preciso ir buscar infos sobre as lengths ao tmdb
-  //TODO: por exemplo, tu numa media vais ter o id, que sera o mesmo id que no tmdb
-  //TODO: para isto funcionar entao, e necessario que faças uma media das lengths: for int length => total+=length e depois no final fazes total/totalMedia
-  //TODO: isto faz-se na funcao getStats do AppUser
-  //TODO: o mesmo para o top, para isso e preciso ir ver todos os user e fazer medias de todos (eu aconselho a droparmos isto pq e mt complexo, mas tu e que sabes)
-  //TODO: as horas totais podem ficar tho, isso e mais chill de se fazer
-  
+  // Total watched/listened/played time in whole hours
+  final int totalHours;
+  // Average length (minutes) of the media the user has consumed. 0 if unknown.
+  final double averageLengthMinutes;
 
-  UserStats({required this.ratings, required this.average, required this.totalMedia, required this.favorites});
+  UserStats({
+    required this.ratings,
+    required this.average,
+    required this.totalMedia,
+    required this.favorites,
+    required this.totalHours,
+    required this.averageLengthMinutes,
+  });
 }
