@@ -113,6 +113,7 @@ class _MoviePageState extends State<MoviePage> {
 
 
   void addComment() {
+    print("ENTREI NO ADD COMMENT");
     if (_commentController.text.trim().isEmpty) return;
 
     setState(() {
