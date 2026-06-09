@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:media_hub/app_util_classes.dart';
 import 'package:media_hub/util/mediacard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:media_hub/services/auth_service.dart';
@@ -36,28 +37,35 @@ class MoviePage extends StatefulWidget {
 
 class _MoviePageState extends State<MoviePage> {
   int? selectedRating;
+  bool? favorite;
 
   @override
   void initState() {
     super.initState();
     loadUserRating();
+    loadFavorite();
+    print('el tipo es${widget.media.type}');
   }
 
   Future<void> loadUserRating() async {
     final uid = AuthService().currentUid;
+
+    String type = widget.media.type;
+      print('el tipo es${widget.media.type}');
+
 
     if (uid == null) return;
 
     final doc = await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
-        .collection('ratings')
+        .collection(type.toLowerCase())
         .doc(widget.media.id.toString())
         .get();
 
-    if (doc.exists) {
+    if (doc.exists && doc['score'] != null) {
       setState(() {
-        selectedRating = doc['rating'];
+        selectedRating = doc['score'];
       });
     }
   }
@@ -70,14 +78,22 @@ class _MoviePageState extends State<MoviePage> {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
-        .collection('ratings')
+        .set({
+        'collections': FieldValue.arrayUnion(['${widget.media.type.toLowerCase()}'])
+    }, SetOptions(merge: true));
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection(widget.media.type.toLowerCase())
         .doc(widget.media.id.toString())
         .set({
-      'rating': rating,
-      'movieId': widget.media.id,
-      'movieTitle': widget.media.title,
+      'score': rating,
+      'favorite': favorite,
       'updatedAt': Timestamp.now(),
-    });
+      'mediaType': widget.media.type.toLowerCase(),
+      //'collections': FieldValue.arrayUnion(['${widget.media.type}']),
+    }, SetOptions(merge: true));
 
     setState(() {
       selectedRating = rating;
@@ -86,7 +102,74 @@ class _MoviePageState extends State<MoviePage> {
     await NotificationService.showNotification(
       title: 'Avaliação Guardada',
       body: 'A sua nota para ${widget.media.title} foi guardada.',
-  );
+    );
+  }
+
+  Future<void> loadFavorite() async
+  {
+    final uid = AuthService().currentUid;
+
+    String type = widget.media.type;
+
+    print("intializing favorite");
+
+
+    if (uid == null) return;
+
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection(type.toLowerCase())
+        .doc(widget.media.id.toString())
+        .get();
+
+    if (doc.exists) {
+      setState(() {
+        favorite = doc['favorite'] ?? false;
+        
+      });
+    }
+    else {
+      favorite = false;
+    }
+    print("So, was it favorite? $favorite");
+  }
+
+  Future<void> toggleFavorite() async
+  {
+    final uid = AuthService().currentUid;
+
+    if (uid == null) return;
+
+    bool isFavorite = !favorite!;
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .set({
+        'collections': FieldValue.arrayUnion(['${widget.media.type.toLowerCase()}'])
+    }, SetOptions(merge: true));
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection(widget.media.type.toLowerCase())
+        .doc(widget.media.id.toString())
+        .set({
+      'score': selectedRating,
+      'favorite': isFavorite,
+      'updatedAt': Timestamp.now(),
+      'mediaType': widget.media.type.toLowerCase(),
+    }, SetOptions(merge: true));
+
+    setState(() {
+      favorite = isFavorite;
+    });
+
+    await NotificationService.showNotification(
+      title: "${isFavorite ? "Adicionado aos" : "Removido dos"} favoritos!",
+      body: "${widget.media.title} foi ${isFavorite ? "adicionado aos favoritos" : "removido dos favoritos"} com sucesso."
+    );
   }
 
 
@@ -284,6 +367,14 @@ class _MoviePageState extends State<MoviePage> {
                       ),
                     );
                   }),
+                ),
+
+        
+                Row(
+                  children: [
+                    Text('Marcar como favorito: ', style: TextStyle(fontSize: 18)),
+                    Checkbox(value: favorite ?? false, onChanged: (_) => toggleFavorite())
+                  ],
                 ),
 
                 const SizedBox(height: 25),

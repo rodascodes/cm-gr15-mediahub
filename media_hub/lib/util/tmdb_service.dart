@@ -127,20 +127,11 @@ class TmdbService {
   }
 
   Future<Map<String, String>> getTitleAndPoster(int id, String mediaType) async {
-    //Movies => movie
-    if(mediaType.toLowerCase().startsWith('m'))
-    {
-      mediaType = mediaType.toLowerCase().substring(0, mediaType.length - 1);
-    }
-    //TV => tv
-    else if (mediaType.toLowerCase().startsWith('t'))
-    {
-      mediaType = mediaType.toLowerCase();
-    }
-
     final url = Uri.parse(
       '$_baseUrl/$mediaType/$id?api_key=$_apiKey&language=pt-PT',
     );
+
+    print("searching for mediatype $mediaType");
 
     final response = await http.get(url);
 
@@ -160,17 +151,7 @@ class TmdbService {
 
   Future<Media> getMediaFromId(int id, String mediaType) async
   {
-    //Movies => movie
-    if(mediaType.toLowerCase().startsWith('m'))
-    {
-      mediaType = mediaType.toLowerCase().substring(0, mediaType.length - 1);
-    }
-    //TV => tv
-    else if (mediaType.toLowerCase().startsWith('t'))
-    {
-      mediaType = mediaType.toLowerCase();
-    }
-
+    print("Media type to search for is $mediaType");
     final url = Uri.parse(
       '$_baseUrl/$mediaType/$id?api_key=$_apiKey&language=pt-PT',
     );
@@ -180,6 +161,8 @@ class TmdbService {
     if(response.statusCode == 200)
     {
       final data = jsonDecode(response.body);
+
+      print("sending data from tmdb to favorites");
 
       return Media(
         id: data['id'],

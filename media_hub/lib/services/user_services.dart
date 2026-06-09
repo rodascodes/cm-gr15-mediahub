@@ -10,7 +10,7 @@ class UserServices {
     final userDoc = await _db.collection('users').doc(uid).get();
     final data = userDoc.data()!;
 
-    final media = <MediaType, Map<String, MediaStats>>{};
+    final media = <String, Map<String, MediaStats>>{};
 
     //inner helper to load one collection (ex: movies)
     Future<Map<String, MediaStats>> loadCollection(String path) async {
@@ -22,17 +22,19 @@ class UserServices {
       };
     }
 
-    for(MediaType m in MediaType.values)
+    final List<String> collections =
+    List<String>.from(data['collections'] ?? []);
+    print("Collections has: ${collections.length}");
+
+    for(String m in collections)
     {
-      media[m] = await loadCollection(m.name);
+      print("I am inside the for loop for $m");
+      media[m] = await loadCollection(m);
       if(media[m]!.isEmpty) media.remove(m); //i know its not null, look above
     }
+
+    print('MEDIA SIZE IS: ${media.length}');
     
-    /*
-    media[MediaType.books] = await loadCollection('books');
-    media[MediaType.music] = await loadCollection('music');
-    media[MediaType.videogames] = await loadCollection('videogames');
-    //these are just in case we scale the app further down the line*/
     return AppUser(
       username: data['username'],
       name: data['name'],
@@ -58,6 +60,6 @@ class UserServices {
       'favorite': movie.favorite,
       'addedAt': Timestamp.now(),
       'mediaType': 'Movies',
-    });
+    }, SetOptions(merge: true));
   }
 }

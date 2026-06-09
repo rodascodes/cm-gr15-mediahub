@@ -160,8 +160,8 @@ class _CategoryCard extends StatelessWidget{
 
 class _CategorySection extends StatelessWidget{
   static const Map<String, IconData> icons = {
-    "movies": Icons.movie,
-    "tv shows": Icons.tv,
+    "movie": Icons.movie,
+    "tv show": Icons.tv,
     "books": Icons.book,
   };
 
@@ -184,8 +184,8 @@ class _CategorySection extends StatelessWidget{
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                for(MediaType mediaType in user.media.keys)
-                  _CategoryCard(icon: icons[mediaType.name] ?? Icons.help, mediaType: mediaType.name, numberWatched: user.media[mediaType]?.length ?? 0) //in flutter ?? means if there is not any then do this instead
+                for(String mediaType in user.media.keys)
+                  _CategoryCard(icon: icons[mediaType] ?? Icons.help, mediaType: mediaType, numberWatched: user.media[mediaType]?.length ?? 0) //in flutter ?? means if there is not any then do this instead
               ],
             ),
           ),
@@ -245,7 +245,8 @@ class _Ratings extends StatelessWidget{
 
 class _Favourite extends StatelessWidget{
   final String title, mediaType, image;
-  final int rating, id;
+  final String? rating;
+  final int id;
 
   const _Favourite({required this.title, required this.mediaType, required this.rating, required this.image, required this.id});
 
@@ -319,6 +320,7 @@ class _FavouritesDisplay extends StatelessWidget {
             FutureBuilder<Map<String, String>>(
               future: _loadMedia(m),
               builder: (context, snapshot) {
+                print("O snapshot tem data? ${snapshot.hasData}, e erro? ${snapshot.hasError} - ${snapshot.error}");
                 if (!snapshot.hasData) {
                   return const CircularProgressIndicator();
                 }
@@ -330,7 +332,7 @@ class _FavouritesDisplay extends StatelessWidget {
                   mediaType: m.mediaType,
                   image: data['posterUrl'] ?? '',
                   id: m.id,
-                  rating: m.score,
+                  rating: m.score.toString(),
                 );
               },
             ),

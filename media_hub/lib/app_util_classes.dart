@@ -1,21 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 //all the media types the app may have
-enum MediaType {
-  movies,
+/*enum MediaType {
+  movie,
+  tv,
   books,
   music,
   videogames,
-}
+}*/
+
+
 
 class MediaStats {
-  final int id;
-  final int score;
+  final int id; //id que vem do tmdb
+  final int score; 
   final bool favorite;
   final DateTime? addedAt;
   final String mediaType;
-  // optional duration in minutes (may be null if not available in Firestore)
-  final int? durationMinutes;
 
   MediaStats({
     required this.id,
@@ -23,7 +24,6 @@ class MediaStats {
     required this.favorite,
     required this.addedAt,
     required this.mediaType,
-    this.durationMinutes,
   });
 
   factory MediaStats.fromFirestore(int id, Map<String, dynamic> data) {
@@ -36,7 +36,6 @@ class MediaStats {
           : null,
       mediaType: (data['mediaType'] ?? 'Unknown'),
       // try common keys for runtime/duration if stored in Firestore
-      durationMinutes: (data['durationMinutes'] as int?) ?? (data['runtime'] as int?),
     );
   }
 }
@@ -44,14 +43,14 @@ class MediaStats {
 class AppUser {
   final String name;
   final String username;
-  Map<MediaType, Map<String, MediaStats>> media; //all the media the user has consumed
+  Map<String, Map<String, MediaStats>> media; //all the media the user has consumed
   UserStats stats;
 
 
 
   AppUser({required this.name, required this.username, required this.media}) : stats = getStats(media);
 
-  static UserStats getStats(Map<MediaType, Map<String, MediaStats>> media)
+  static UserStats getStats(Map<String, Map<String, MediaStats>> media)
   {
     final ratings = {
       for (var i = 10; i >= 1; i--) i: 0,
@@ -63,8 +62,10 @@ class AppUser {
 
     for (final mediaByType in media.values)
     {
+      print("Now going through $mediaByType");
       for (final item in mediaByType.values)
       {
+        print("the item is ${item.score}");
         ratings[item.score] = (ratings[item.score] ?? 0) + 1;
         totalRating += item.score;
         totalMedia++;
@@ -75,7 +76,7 @@ class AppUser {
       favs.sort((a, b) => b.score.compareTo(a.score)); //orders in descending order
 
       // compute duration stats if available
-      int totalMinutes = 0;
+      /*int totalMinutes = 0;
       int knownDurations = 0;
       for (final mediaByType in media.values) {
         for (final item in mediaByType.values) {
@@ -84,10 +85,10 @@ class AppUser {
             knownDurations++;
           }
         }
-      }
+      }*/
 
-      final int totalHours = totalMinutes ~/ 60;
-      final double averageLengthMinutes = knownDurations > 0 ? totalMinutes / knownDurations : 0.0; //if exists at least one media with known duration, compute average, otherwise 0
+      //final int totalHours = totalMinutes ~/ 60;
+      //final double averageLengthMinutes = knownDurations > 0 ? totalMinutes / knownDurations : 0.0; //if exists at least one media with known duration, compute average, otherwise 0
 
       final double averageRating = totalMedia > 0 ? (totalRating.toDouble() / totalMedia) : 0.0; //if the user has rated at least one media, compute average, otherwise 0
 
@@ -96,8 +97,8 @@ class AppUser {
         average: averageRating,
         totalMedia: totalMedia,
         favorites: favs,
-        totalHours: totalHours,
-        averageLengthMinutes: averageLengthMinutes,
+        totalHours: 6,
+        averageLengthMinutes: 6,
       );
   }
 
