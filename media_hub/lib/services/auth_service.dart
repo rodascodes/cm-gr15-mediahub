@@ -26,7 +26,7 @@ class AuthService {
     });
 
     //TODO: THIS IS JUST FOR TESTING PURPOSES! IT HAS TO BE REMOVED IN THE FUTURE!
-    await FirebaseFirestore.instance.collection('users').doc(credential.user!.uid).collection('movies').doc('movieId1').set({
+    await FirebaseFirestore.instance.collection('users').doc(credential.user!.uid).collection('movies').doc('1105551').set({
       'score': 5,
       'favorite': true,
       'completedAt': Timestamp.now(),
