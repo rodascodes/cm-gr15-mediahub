@@ -6,24 +6,6 @@ import '../main.dart';
 
 // ─── Data models ────────────────────────────────────────────────────────────
 
-class DiscussedItem {
-  final int id;
-  final String title;
-  final int comments;
-  final double rating;
-  final IconData icon;
-  final String imageUrl;
-
-  const DiscussedItem({
-    required this.id,
-    required this.title,
-    required this.comments,
-    required this.rating,
-    required this.icon,
-    required this.imageUrl,
-  });
-}
-
 class _ForumTopic {
   final String title;
   final String author;
@@ -76,15 +58,31 @@ final List<_ForumTopic> _recentTopics = [
 ];
 
 // ─── Main page ───────────────────────────────────────────────────────────────
-class ForumPage extends StatelessWidget {
+class ForumPage extends StatefulWidget {
   const ForumPage({super.key});
+  @override
+  State<ForumPage> createState() => _ForumPageState();
+}
+  class _ForumPageState extends State<ForumPage> with AutomaticKeepAliveClientMixin{
+
+  @override
+  bool get wantKeepAlive => true;
+  final _tmdbService = TmdbService();
+  late Future<List<Media>> _mostDiscussedFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _mostDiscussedFuture = _tmdbService.getMostDiscussed();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final tmdbService = TmdbService();
+    super.build(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, //remove the navigation arrow
         actions: [
           IconButton(
             icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
@@ -106,7 +104,7 @@ class ForumPage extends StatelessWidget {
               ),
             ),
             const Text(
-              'Discussões da comunidade',
+              'Community Discussions',
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
@@ -134,15 +132,15 @@ class ForumPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   const Text(
-                    'Mais Discutidos',
+                    'Most Discussed',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
 
-FutureBuilder<List<DiscussedItem>>(
-  future: tmdbService.getMostDiscussed(),
+FutureBuilder<List<Media>>(
+  future: _mostDiscussedFuture,
   builder: (context, snapshot) {
     if (snapshot.connectionState == ConnectionState.waiting) {
       return const Center(
@@ -154,7 +152,7 @@ FutureBuilder<List<DiscussedItem>>(
     } 
     else if (snapshot.hasError) {
       return Center(
-        child: Text('Erro: ${snapshot.error}', style: TextStyle(color: Theme.of(context).hintColor)),
+        child: Text('Error: ${snapshot.error}', style: TextStyle(color: Theme.of(context).hintColor)),
       );
     } 
     else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
@@ -168,16 +166,8 @@ FutureBuilder<List<DiscussedItem>>(
         itemBuilder: (context, index) {
           final item = items[index];
           
-          final adaptedMedia = Media(
-            id: item.id, 
-            title: item.title, 
-            imageUrl: item.imageUrl,
-            type: '${item.comments} comentários', 
-            rating: item.rating, 
-            overview: '', posterPath: '', releaseDate: ''
-          );
           return HorizontalMediaCard(
-            media: adaptedMedia,
+            media: item,
           );
         },
       );
@@ -202,7 +192,7 @@ FutureBuilder<List<DiscussedItem>>(
                   ),
                   const SizedBox(width: 6),
                   const Text(
-                    'Tópicos Recentes',
+                    'Recent Topics',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ],

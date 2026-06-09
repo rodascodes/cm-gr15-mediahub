@@ -16,8 +16,7 @@ class MainScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final location =
-        GoRouter.of(context).routeInformationProvider.value.uri.path;
+    final location = GoRouterState.of(context).uri.path;
     final currentIndex = getPageLocationIndex(location);
 
     return Scaffold(
@@ -25,8 +24,7 @@ class MainScaffold extends StatelessWidget {
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: currentIndex,
         onItemTapped: (index) {
-          context.push(routes[ //push is better than go cause with push we can go back :)
-              index]);
+          context.go(routes[index]);
         },
       ),
     );
