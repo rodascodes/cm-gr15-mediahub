@@ -18,7 +18,7 @@ class UserServices {
 
       return {
         for (final doc in snapshot.docs)
-          doc.id: MediaStats.fromFirestore(doc.id, doc.data()),
+          doc.id: MediaStats.fromFirestore(int.parse(doc.id), doc.data()),
       };
     }
 
@@ -47,7 +47,7 @@ class UserServices {
         .collection('users')
         .doc(uid)
         .collection('movies')
-        .doc(movie.id)
+        .doc(movie.id.toString())
         .set({
       'score': movie.score,
       'favorite': movie.favorite,

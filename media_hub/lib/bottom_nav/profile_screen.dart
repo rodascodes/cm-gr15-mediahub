@@ -4,6 +4,8 @@ import 'package:media_hub/services/auth_service.dart';
 import 'package:media_hub/services/user_services.dart';
 import 'package:media_hub/util/app_colors.dart';
 import 'package:go_router/go_router.dart';
+import 'package:media_hub/util/mediacard.dart';
+import 'package:media_hub/util/tmdb_service.dart';
 
 class _MockupUser {
   static int ratings = 247;
@@ -242,16 +244,22 @@ class _Ratings extends StatelessWidget{
 }
 
 class _Favourite extends StatelessWidget{
-  final String title, mediaType;
-  final int rating;
+  final String title, mediaType, image;
+  final int rating, id;
 
-  const _Favourite({required this.title, required this.mediaType, required this.rating});
+  const _Favourite({required this.title, required this.mediaType, required this.rating, required this.image, required this.id});
 
   @override
   Widget build(BuildContext context)
   {
     return GestureDetector(
-      onTap: () => context.push('/info'),
+      onTap: () async {
+        final media = await TmdbService().getMediaFromId(id, mediaType);
+        if(context.mounted)
+        {
+          context.push('/info', extra: media);
+        }
+      },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         padding: EdgeInsets.all(12),
@@ -261,7 +269,18 @@ class _Favourite extends StatelessWidget{
         ),
         child: Row(
           children: [
-            SizedBox(height: 100, width: 50, child: Image.network("https://cdn.nos.pt/cinemas/movies/files/700x1000/ad6c2d27-24a4-4736-a31c-aa2b9826cbdc_Image.jpg"),),
+            SizedBox(
+              height: 100,
+              width: 70,
+              child: image.isNotEmpty
+                  ? Image.network(image, fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace)
+                    {
+                      return const Icon(Icons.image_not_supported);
+                    },
+                    )
+                  : const Icon(Icons.image_not_supported),
+            ),
             SizedBox(width: 10),
             Expanded(
               child:Column(
@@ -282,18 +301,41 @@ class _Favourite extends StatelessWidget{
 
 }
 
-class _FavouritesDisplay extends StatelessWidget{
+
+class _FavouritesDisplay extends StatelessWidget {
   final AppUser user;
   const _FavouritesDisplay({required this.user});
 
+  Future<Map<String, String>> _loadMedia(MediaStats m) {
+    return TmdbService().getTitleAndPoster(m.id, m.mediaType);
+  }
+
   @override
-  Widget build(BuildContext context)
-  {
-    return Column(
-      children: [
-        for(MediaStats m in user.stats.favorites)
-          _Favourite(title: m.id, mediaType: m.mediaType, rating: m.score)
-      ],
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          for (MediaStats m in user.stats.favorites)
+            FutureBuilder<Map<String, String>>(
+              future: _loadMedia(m),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const CircularProgressIndicator();
+                }
+
+                final data = snapshot.data!;
+
+                return _Favourite(
+                  title: data['title'] ?? '',
+                  mediaType: m.mediaType,
+                  image: data['posterUrl'] ?? '',
+                  id: m.id,
+                  rating: m.score,
+                );
+              },
+            ),
+        ],
+      ),
     );
   }
 }

@@ -104,4 +104,74 @@ class TmdbService {
       throw Exception('Erro de ligação: $e');
     }
   }
+
+  Future<Map<String, String>> getTitleAndPoster(int id, String mediaType) async {
+    //Movies => movie
+    if(mediaType.toLowerCase().startsWith('m'))
+    {
+      mediaType = mediaType.toLowerCase().substring(0, mediaType.length - 1);
+    }
+    //TV => tv
+    else if (mediaType.toLowerCase().startsWith('t'))
+    {
+      mediaType = mediaType.toLowerCase();
+    }
+
+    final url = Uri.parse(
+      '$_baseUrl/$mediaType/$id?api_key=$_apiKey&language=pt-PT',
+    );
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200)
+    {
+      final data = jsonDecode(response.body);
+      return {
+        'title': data['title'] ?? data['name'] ?? '',
+        'posterUrl': data['poster_path'] != null
+            ? 'https://image.tmdb.org/t/p/w500${data['poster_path']}'
+            : '',
+      };
+    }
+
+    throw Exception('Title not found');
+  }
+
+  Future<Media> getMediaFromId(int id, String mediaType) async
+  {
+    //Movies => movie
+    if(mediaType.toLowerCase().startsWith('m'))
+    {
+      mediaType = mediaType.toLowerCase().substring(0, mediaType.length - 1);
+    }
+    //TV => tv
+    else if (mediaType.toLowerCase().startsWith('t'))
+    {
+      mediaType = mediaType.toLowerCase();
+    }
+
+    final url = Uri.parse(
+      '$_baseUrl/$mediaType/$id?api_key=$_apiKey&language=pt-PT',
+    );
+
+    final response = await http.get(url);
+
+    if(response.statusCode == 200)
+    {
+      final data = jsonDecode(response.body);
+
+      return Media(
+        id: data['id'],
+        title: data['title'] ?? data['name'] ?? '',
+        type: mediaType,
+        rating: (data['vote_average'] as num).toDouble(),
+        imageUrl: 'https://image.tmdb.org/t/p/w500${data['poster_path']}',
+        overview: data['overview'] ?? '',
+        posterPath: data['poster_path'] ?? '',
+        releaseDate: data['release_date'] ?? data['first_air_date'] ?? '',
+      );
+    }
+
+    throw Exception("It's joever");
+  }
 }
