@@ -3,16 +3,47 @@ import 'package:media_hub/util/mediacard.dart';
 import '../util/tmdb_service.dart';
 import '../main.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin {
+  
+  @override
+  bool get wantKeepAlive => true;
+  final _tmdbService = TmdbService();
+  late Future<List<Media>> _combinedTrendingFuture;
+  
+  @override
+  void initState() {
+    super.initState();
+    final futureMovies = _tmdbService.getTrending('/movie');
+    final futureTvShows = _tmdbService.getTrending('/tv');
+    _combinedTrendingFuture = Future.wait([futureMovies, futureTvShows]).then((results) {
+      final movies = results[0];
+      final tvShows = results[1];
+
+      List<Media> mixedList = [];
+      
+      if (movies.isNotEmpty) mixedList.add(movies[0]);
+      if (tvShows.isNotEmpty) mixedList.add(tvShows[0]);
+      if (movies.length > 1) mixedList.add(movies[1]);
+      if (tvShows.length > 1) mixedList.add(tvShows[1]);
+
+      return mixedList;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final tmdbService = TmdbService();
+    super.build(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, //remove the navigation arrow
         actions: [
           IconButton(
             icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
@@ -50,13 +81,13 @@ class HomeScreen extends StatelessWidget {
                 'Trending',
                 style: TextStyle(
                   fontSize: 20,
-                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
 
   FutureBuilder<List<Media>>(
-    future: tmdbService.getTrending('/movie'),
+    future: _combinedTrendingFuture,
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
         return const Center(
@@ -68,7 +99,7 @@ class HomeScreen extends StatelessWidget {
       } 
       else if (snapshot.hasError) {
         return Center(
-          child: Text('Erro ao carregar filmes: ${snapshot.error}'),
+          child: Text('Error loading: ${snapshot.error}'),
         );
       } 
       else if (snapshot.hasData) {
@@ -79,7 +110,7 @@ class HomeScreen extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.all(10),
 
-          itemCount: trendingList.length > 4 ? 4 : trendingList.length, 
+          itemCount: trendingList.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: 10,

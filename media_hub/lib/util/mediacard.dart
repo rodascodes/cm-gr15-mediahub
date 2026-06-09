@@ -107,7 +107,7 @@ class HorizontalMediaCard extends StatelessWidget {
                     children: [
                       const Icon(Icons.star, size: 16, color: Colors.amber),
                       const SizedBox(width: 4),
-                      Text(media.rating.toString(), style: const TextStyle(fontWeight: FontWeight.w500)),
+                      Text(media.rating.toStringAsFixed(1), style: const TextStyle(fontWeight: FontWeight.w500)),
                     ],
                   ),
                 ],
