@@ -3,9 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 //all the media types the app may have
 enum MediaType {
   movies,
-  books,
-  music,
-  videogames,
+  series,
 }
 
 class MediaStats {
