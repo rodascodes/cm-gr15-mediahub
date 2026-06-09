@@ -18,14 +18,6 @@ class Media {
   Media({required this.id, required this.score, required this.favorite, required this.addedAt, required this.mediaType});
 
   factory Media.fromFirestore(String id, Map<String, dynamic> data) {
-    //int score = data['score'];
-    //bool favorite = data['favorite'];
-    //print('everything is fine right before this goofy opeation');
-    //DateTime added = (data['addedAt'] as Timestamp).toDate();
-    
-    //print('data received is: $score, $favorite, $added, and added is ${added.runtimeType}');
-    //DateTime addedWorks = (data['completedAt'] as Timestamp).toDate();
-    //print('za fixer $addedWorks');
     return Media(
       id: id,
       score: data['score'] ?? 0,
@@ -41,16 +33,6 @@ class AppUser {
   final String username;
   Map<MediaType, Map<String, Media>> media; //all the media the user has consumed
   UserStats stats;
-  //Map<int, int> ratings; //rating 10 -> x movies; rating 9 -> y movies
-  //double average; //average rating can be calculated through the ratings map
-  //int hours; //grabs the duration of each movie and sums them all up
-  //int top; //what is this user's position in the website (hours spent)
-  
-
-  //Map<int, int> ratings;
-  //double average;
-  //int totalMedia;
-  //Map<MediaType, Map<String, Media>> favorites; //the favourite media the user has consumed
 
 
 
@@ -58,7 +40,6 @@ class AppUser {
 
   static UserStats getStats(Map<MediaType, Map<String, Media>> media)
   {
-    print('I am literally printing right now with: $media');
     final ratings = {
       for (var i = 10; i >= 1; i--) i: 0,
     };
@@ -93,6 +74,13 @@ class UserStats{
   final List<Media> favorites;
   //final int totalHours;
   //final int top;
+  //TODO: para estas comentadas funcionarem é preciso ir buscar infos sobre as lengths ao tmdb
+  //TODO: por exemplo, tu numa media vais ter o id, que sera o mesmo id que no tmdb
+  //TODO: para isto funcionar entao, e necessario que faças uma media das lengths: for int length => total+=length e depois no final fazes total/totalMedia
+  //TODO: isto faz-se na funcao getStats do AppUser
+  //TODO: o mesmo para o top, para isso e preciso ir ver todos os user e fazer medias de todos (eu aconselho a droparmos isto pq e mt complexo, mas tu e que sabes)
+  //TODO: as horas totais podem ficar tho, isso e mais chill de se fazer
+  
 
   UserStats({required this.ratings, required this.average, required this.totalMedia, required this.favorites});
 }

@@ -6,13 +6,9 @@ import 'package:media_hub/util/app_colors.dart';
 import 'package:go_router/go_router.dart';
 
 class _MockupUser {
-  static String name = "João Silva";
-  static String username = "joaosilva";
   static int ratings = 247;
-  static double average = 7.8;
   static int hours = 156;
   static int top = 5;
-  static Map<String, int> mediaTypes = {"Movies" : 89, "TV Shows" : 124, "Books" : 34};
 }
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -106,9 +102,10 @@ class _Header extends StatelessWidget {
             children: [
               Text(user.name, style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
               GestureDetector(
-                child: Icon(Icons.settings, color: Colors.white),
+                child: Icon(Icons.logout_outlined, color: Colors.red),
                 onTap: () {
-                  print("TODO: Implement settings functionality");
+                  AuthService().logout();
+                  context.go('/login');
                 },
               ),
             ],
@@ -197,10 +194,6 @@ class _CategorySection extends StatelessWidget{
   }
 }
 
-//DUE TO TIME CONSTRAINTS, FROM HERE ON OUT THINGS WILL BE HARD CODED JUST TO SHOW HOW IT WOULD LOOK LIKE.
-//after getting data from a database things will no longer be hardcoded (will be using something like the MockupUser being used above)
-//but for now this will do
-
 class _RatingRow extends StatelessWidget{
   final int rating;
   final int count;
@@ -242,14 +235,6 @@ class _Ratings extends StatelessWidget{
               if (count is int && count >= 1)
                 _RatingRow(rating: i, count: count),
                   
-          /*
-          _RatingRow(rating: 10, count: 45),
-          _RatingRow(rating: 9, count: 62),
-          _RatingRow(rating: 8, count: 71),
-          _RatingRow(rating: 7, count: 38),
-          _RatingRow(rating: 6, count: 19),
-          _RatingRow(rating: 5, count: 12),
-          */
         ],
       ),
     );
@@ -308,9 +293,6 @@ class _FavouritesDisplay extends StatelessWidget{
       children: [
         for(Media m in user.stats.favorites)
           _Favourite(title: m.id, mediaType: m.mediaType, rating: m.score)
-        /*_Favourite(title: "El Projeto Ave Maria", mediaType: "Movie", rating: 10),
-        _Favourite(title: "El Projeto Ave Maria 2", mediaType: "Movie", rating: 10),
-        _Favourite(title: "El Projeto Ave Maria: El Seriado de Netflix", mediaType: "Tv Show", rating: 10),*/
       ],
     );
   }

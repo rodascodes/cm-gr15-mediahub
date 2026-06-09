@@ -34,8 +34,6 @@ class AuthService {
     });
 
     return credential;
-    //print('email is $email, password is $password');
-    //return await _auth.createUserWithEmailAndPassword(email: email, password: password);
   }
 
   Future<UserCredential> login(String email, String password) async
