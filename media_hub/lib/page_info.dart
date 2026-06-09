@@ -1,14 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:media_hub/util/mediacard.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:media_hub/services/auth_service.dart';
 
-class MoviePage extends StatelessWidget {
+class MoviePage extends StatefulWidget {
   final Media media;
 
   const MoviePage({
     super.key,
     required this.media,
   });
+
+  @override
+  State<MoviePage> createState() => _MoviePageState();
+}
+
+class _MoviePageState extends State<MoviePage> {
+  int? selectedRating;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserRating();
+  }
+
+  Future<void> loadUserRating() async {
+    final uid = AuthService().currentUid;
+
+    if (uid == null) return;
+
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('ratings')
+        .doc(widget.media.id.toString())
+        .get();
+
+    if (doc.exists) {
+      setState(() {
+        selectedRating = doc['rating'];
+      });
+    }
+  }
+
+  Future<void> saveRating(int rating) async {
+    final uid = AuthService().currentUid;
+
+    if (uid == null) return;
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('ratings')
+        .doc(widget.media.id.toString())
+        .set({
+      'rating': rating,
+      'movieId': widget.media.id,
+      'movieTitle': widget.media.title,
+      'updatedAt': Timestamp.now(),
+    });
+
+    setState(() {
+      selectedRating = rating;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +101,7 @@ class MoviePage extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.network(
-                          "https://image.tmdb.org/t/p/w500${media.posterPath}",
+                          "https://image.tmdb.org/t/p/w500${widget.media.posterPath}",
                           width: 120,
                           height: 180,
                           fit: BoxFit.cover,
@@ -60,7 +116,7 @@ class MoviePage extends StatelessWidget {
                           children: [
 
                             Text(
-                              media.title,
+                              widget.media.title,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 24,
@@ -71,7 +127,7 @@ class MoviePage extends StatelessWidget {
                             const SizedBox(height: 8),
 
                             Text(
-                              media.releaseDate,
+                              widget.media.releaseDate,
                               style: const TextStyle(
                                 color: Colors.white70,
                               ),
@@ -80,7 +136,7 @@ class MoviePage extends StatelessWidget {
                             const SizedBox(height: 4),
 
                             Text(
-                              "⭐ ${media.rating.toStringAsFixed(1)}",
+                              "⭐ ${widget.media.rating.toStringAsFixed(1)}",
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
@@ -90,7 +146,7 @@ class MoviePage extends StatelessWidget {
                             const SizedBox(height: 12),
 
                             Text(
-                              media.overview,
+                              widget.media.overview,
                               maxLines: 6,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -123,18 +179,36 @@ class MoviePage extends StatelessWidget {
 
                 const SizedBox(height: 10),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: List.generate(10, (index) {
-                    return Container(
-                      width: 32,
-                      height: 32,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(8),
+                    final value = index + 1;
+
+                    return GestureDetector(
+                      onTap: () {
+                        saveRating(value);
+                      },
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: selectedRating == value
+                              ? Colors.amber
+                              : Colors.grey[300],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          '$value',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: selectedRating == value
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
                       ),
-                      child: Text("${index + 1}"),
                     );
                   }),
                 ),
