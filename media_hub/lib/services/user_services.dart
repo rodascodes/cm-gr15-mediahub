@@ -43,6 +43,11 @@ class UserServices {
   //adds a movie to the users profile document in firestore
   Future<void> addMovie(MediaStats movie) async {
     final uid = AuthService().currentUid;
+
+    await _db.collection('users').doc(uid).update({
+      'collections': FieldValue.arrayUnion(['movies']),
+    });
+
     await _db
         .collection('users')
         .doc(uid)

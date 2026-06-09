@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:media_hub/routes.dart';
+import 'package:media_hub/services/auth_service.dart';
 import 'util/app_colors.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
