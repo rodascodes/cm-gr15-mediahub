@@ -1,15 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 //all the media types the app may have
-/*enum MediaType {
-  movie,
-  tv,
-  books,
-  music,
-  videogames,
-}*/
-
-
+enum MediaType {
+  movies,
+  series,
+}
 
 class MediaStats {
   final int id; //id que vem do tmdb

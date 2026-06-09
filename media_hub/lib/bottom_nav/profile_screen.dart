@@ -4,8 +4,26 @@ import 'package:media_hub/services/auth_service.dart';
 import 'package:media_hub/services/user_services.dart';
 import 'package:media_hub/util/app_colors.dart';
 import 'package:go_router/go_router.dart';
-import 'package:media_hub/util/mediacard.dart';
 import 'package:media_hub/util/tmdb_service.dart';
+
+
+final movieList = [
+  {
+    "title": "Dune Part Two",
+    "rating": 9,
+    "year": "2024",
+    "poster": "...",
+  }
+];
+
+final seriesList = [
+  {
+    "title": "Breaking Bad",
+    "rating": 10,
+    "year": "2008",
+    "poster": "...",
+  }
+];
 
 class _MockupUser {
   static int ratings = 247;
@@ -129,30 +147,61 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _CategoryCard extends StatelessWidget{
+class _CategoryCard extends StatelessWidget {
   final IconData icon;
   final String mediaType;
   final int numberWatched;
 
-  const _CategoryCard({required this.icon, required this.mediaType, required this.numberWatched});
+  const _CategoryCard({
+    required this.icon,
+    required this.mediaType,
+    required this.numberWatched,
+  });
+
+
 
   @override
-  Widget build(BuildContext context)
-  {
-    return Container(
-      width: 100,
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: Colors.purple,),
-          SizedBox(height: 8,),
-          Text("$numberWatched", style: TextStyle(fontWeight: FontWeight.bold),),
-          Text(mediaType),
-        ],
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (mediaType == "Movies") {
+          context.push(
+            '/collection',
+            extra: {
+              "title": "My Movies",
+              "items": movieList,
+            },
+          );
+        }
+
+        if (mediaType == "Series") {
+          context.push(
+            '/collection',
+            extra: {
+              "title": "My Series",
+              "items": seriesList,
+            },
+          );
+        }
+      },
+      child: Container(
+        width: 100,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: Colors.purple),
+            const SizedBox(height: 8),
+            Text(
+              "$numberWatched",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text(mediaType),
+          ],
+        ),
       ),
     );
   }
@@ -177,15 +226,24 @@ class _CategorySection extends StatelessWidget{
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("Categories", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          SizedBox(height: 12), //to give some space
+          SizedBox(height: 12),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child:
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                for(String mediaType in user.media.keys)
-                  _CategoryCard(icon: icons[mediaType] ?? Icons.help, mediaType: mediaType, numberWatched: user.media[mediaType]?.length ?? 0) //in flutter ?? means if there is not any then do this instead
+                _CategoryCard(
+                  icon: Icons.movie,
+                  mediaType: "Movies",
+                  numberWatched: user.media[MediaType.movies]?.length ?? 0,
+                ),
+
+                _CategoryCard(
+                  icon: Icons.tv,
+                  mediaType: "Series",
+                  numberWatched: user.media[MediaType.series]?.length ?? 0,
+                ),
               ],
             ),
           ),
