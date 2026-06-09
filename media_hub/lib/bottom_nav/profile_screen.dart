@@ -233,16 +233,16 @@ class _CategorySection extends StatelessWidget{
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _CategoryCard(
-                  icon: Icons.movie,
-                  mediaType: "Movies",
-                  numberWatched: user.media[MediaType.movies]?.length ?? 0,
-                ),
-
-                _CategoryCard(
-                  icon: Icons.tv,
-                  mediaType: "Series",
-                  numberWatched: user.media[MediaType.series]?.length ?? 0,
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child:
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      for(String mediaType in user.media.keys)
+                        _CategoryCard(icon: icons[mediaType] ?? Icons.help, mediaType: '${mediaType[0].toUpperCase()}${mediaType.substring(1)}s', numberWatched: user.media[mediaType]?.length ?? 0) //in flutter ?? means if there is not any then do this instead
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -313,7 +313,7 @@ class _Favourite extends StatelessWidget{
   {
     return GestureDetector(
       onTap: () async {
-        final media = await TmdbService().getMediaFromId(id, mediaType);
+        final media = await TmdbService().getMediaFromId(id, mediaType.toLowerCase());
         if(context.mounted)
         {
           context.push('/info', extra: media);
@@ -387,7 +387,7 @@ class _FavouritesDisplay extends StatelessWidget {
 
                 return _Favourite(
                   title: data['title'] ?? '',
-                  mediaType: m.mediaType,
+                  mediaType: '${m.mediaType[0].toUpperCase()}${m.mediaType.substring(1)}',
                   image: data['posterUrl'] ?? '',
                   id: m.id,
                   rating: m.score.toString(),

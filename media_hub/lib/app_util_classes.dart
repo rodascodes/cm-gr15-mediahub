@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 //all the media types the app may have
+/*
 enum MediaType {
   movies,
   series,
 }
+*/
 
 class MediaStats {
   final int id; //id que vem do tmdb
@@ -87,9 +89,11 @@ class AppUser {
 
       final double averageRating = totalMedia > 0 ? (totalRating.toDouble() / totalMedia) : 0.0; //if the user has rated at least one media, compute average, otherwise 0
 
+      double roundedAverage = double.parse(averageRating.toStringAsFixed(2));
+      
       return UserStats(
         ratings: ratings,
-        average: averageRating,
+        average: roundedAverage,
         totalMedia: totalMedia,
         favorites: favs,
         totalHours: 6,

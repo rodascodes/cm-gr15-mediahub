@@ -9,6 +9,7 @@ class TmdbService {
   static const String _movieType = '/movie';
 
   Future<List<Media>> getTrending(String type) async {
+    print("the working type in trending is $type");
     final url = Uri.parse('$_baseUrl/trending$type/day?api_key=$_apiKey&language=pt-PT');
     
     try {
@@ -127,17 +128,34 @@ class TmdbService {
   }
 
   Future<Map<String, String>> getTitleAndPoster(int id, String mediaType) async {
+    if(mediaType.startsWith("t"))
+    {
+      mediaType = mediaType.substring(0, 2).trim();
+    }
+    
     final url = Uri.parse(
       '$_baseUrl/$mediaType/$id?api_key=$_apiKey&language=pt-PT',
     );
 
-    print("searching for mediatype $mediaType");
+    if(mediaType.startsWith("t"))
+    {
+      mediaType = mediaType.substring(0, 2).trim();
+    }
+    print("searching for mediatype $mediaType, with id $id");
 
     final response = await http.get(url);
+
+    print("was the response for $mediaType successful? ${response.statusCode}");
 
     if (response.statusCode == 200)
     {
       final data = jsonDecode(response.body);
+      if(mediaType == 'tv')
+      {
+        print("at least he knows it's a tv");
+        String title = data['name'];
+        print("the title of the tv show is $title");
+      }
       return {
         'title': data['title'] ?? data['name'] ?? '',
         'posterUrl': data['poster_path'] != null
@@ -151,6 +169,10 @@ class TmdbService {
 
   Future<Media> getMediaFromId(int id, String mediaType) async
   {
+    if(mediaType.startsWith("t"))
+    {
+      mediaType = mediaType.substring(0, 2).trim();
+    }
     print("Media type to search for is $mediaType");
     final url = Uri.parse(
       '$_baseUrl/$mediaType/$id?api_key=$_apiKey&language=pt-PT',
