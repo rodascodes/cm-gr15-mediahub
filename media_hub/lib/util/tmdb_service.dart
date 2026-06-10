@@ -9,7 +9,6 @@ class TmdbService {
   static const String _movieType = '/movie';
 
   Future<List<Media>> getTrending(String type) async {
-    print("the working type in trending is $type");
     final url = Uri.parse('$_baseUrl/trending$type/day?api_key=$_apiKey&language=pt-PT');
     
     try {
@@ -127,7 +126,10 @@ class TmdbService {
     }
   }
 
+  //gets the title and poster of a given media; useful in favorites section on profile
   Future<Map<String, String>> getTitleAndPoster(int id, String mediaType) async {
+    //have to do this because of the way things were coded, tv can be "TV"; "TV Shows"; or "TV Show 3465 comments"
+    //since tmdb search requires the mediatype to either be "movie" or "tv" in the url's formation, I had to format whatever I was getting here so it doens't break
     if(mediaType.startsWith("t"))
     {
       mediaType = mediaType.substring(0, 2).trim();
@@ -137,25 +139,11 @@ class TmdbService {
       '$_baseUrl/$mediaType/$id?api_key=$_apiKey&language=pt-PT',
     );
 
-    if(mediaType.startsWith("t"))
-    {
-      mediaType = mediaType.substring(0, 2).trim();
-    }
-    print("searching for mediatype $mediaType, with id $id");
-
     final response = await http.get(url);
-
-    print("was the response for $mediaType successful? ${response.statusCode}");
 
     if (response.statusCode == 200)
     {
       final data = jsonDecode(response.body);
-      if(mediaType == 'tv')
-      {
-        print("at least he knows it's a tv");
-        String title = data['name'];
-        print("the title of the tv show is $title");
-      }
       return {
         'title': data['title'] ?? data['name'] ?? '',
         'posterUrl': data['poster_path'] != null
@@ -167,13 +155,15 @@ class TmdbService {
     throw Exception('Title not found');
   }
 
+  //gets media from tmdb by id; also requires what is the media type because tv and movie behave differently
   Future<Media> getMediaFromId(int id, String mediaType) async
   {
+    //already explained this in the function before this one, it's so the url is valid for tmdb checkup
     if(mediaType.startsWith("t"))
     {
       mediaType = mediaType.substring(0, 2).trim();
     }
-    print("Media type to search for is $mediaType");
+
     final url = Uri.parse(
       '$_baseUrl/$mediaType/$id?api_key=$_apiKey&language=pt-PT',
     );
@@ -183,8 +173,6 @@ class TmdbService {
     if(response.statusCode == 200)
     {
       final data = jsonDecode(response.body);
-
-      print("sending data from tmdb to favorites");
 
       return Media(
         id: data['id'],

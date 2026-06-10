@@ -7,26 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:media_hub/util/tmdb_service.dart';
 
 
-final movieList = [
-  {
-    "title": "Dune Part Two",
-    "rating": 9,
-    "year": "2024",
-    "poster": "...",
-  }
-];
-
-final seriesList = [
-  {
-    "title": "Breaking Bad",
-    "rating": 10,
-    "year": "2008",
-    "poster": "...",
-  }
-];
-
 class _MockupUser {
-  static int ratings = 247;
+  //static int ratings = 247;
   static int hours = 156;
   static int top = 5;
 }
@@ -51,9 +33,7 @@ class ProfileScreen extends StatelessWidget {
             return const Center(child: Text("Error loading user"));
           }
 
-          //pog
           final user = snapshot.data!;
-
           return SingleChildScrollView(
             child: Column(
               children: [
@@ -122,7 +102,7 @@ class _Header extends StatelessWidget {
             children: [
               Text(user.name, style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
               GestureDetector(
-                child: Icon(Icons.logout_outlined, color: Colors.red),
+                child: Icon(Icons.logout_outlined, color: Colors.black),
                 onTap: () {
                   AuthService().logout();
                   context.go('/login');
@@ -162,46 +142,21 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        if (mediaType == "Movies") {
-          context.push(
-            '/collection',
-            extra: {
-              "title": "My Movies",
-              "items": movieList,
-            },
-          );
-        }
-
-        if (mediaType == "Series") {
-          context.push(
-            '/collection',
-            extra: {
-              "title": "My Series",
-              "items": seriesList,
-            },
-          );
-        }
-      },
-      child: Container(
-        width: 100,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: Colors.purple),
-            const SizedBox(height: 8),
-            Text(
-              "$numberWatched",
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Text(mediaType),
-          ],
-        ),
+    return Container(
+      width: 100,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: Colors.purple),
+          const SizedBox(height: 8),
+          Text("$numberWatched",style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Text(mediaType),
+        ],
       ),
     );
   }
@@ -210,7 +165,7 @@ class _CategoryCard extends StatelessWidget {
 class _CategorySection extends StatelessWidget{
   static const Map<String, IconData> icons = {
     "movie": Icons.movie,
-    "tv show": Icons.tv,
+    "tv": Icons.tv,
     "books": Icons.book,
   };
 
@@ -240,7 +195,13 @@ class _CategorySection extends StatelessWidget{
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       for(String mediaType in user.media.keys)
-                        _CategoryCard(icon: icons[mediaType] ?? Icons.help, mediaType: '${mediaType[0].toUpperCase()}${mediaType.substring(1)}s', numberWatched: user.media[mediaType]?.length ?? 0) //in flutter ?? means if there is not any then do this instead
+                        _CategoryCard(
+                          icon: icons[mediaType] ?? Icons.help,
+                          mediaType: mediaType[0] == 't'
+                              ? '${mediaType[0].toUpperCase()}${mediaType.substring(1)}' //i dont want TV to be Tvs
+                              : '${mediaType[0].toUpperCase()}${mediaType.substring(1)}s',
+                          numberWatched: user.media[mediaType]?.length ?? 0,
+                        ),
                     ],
                   ),
                 ),
@@ -257,8 +218,9 @@ class _CategorySection extends StatelessWidget{
 class _RatingRow extends StatelessWidget{
   final int rating;
   final int count;
+  final int totalRated;
   
-  const _RatingRow({required this.rating, required this.count});
+  const _RatingRow({required this.rating, required this.count, required this.totalRated});
 
   @override
   Widget build(BuildContext context)
@@ -269,7 +231,7 @@ class _RatingRow extends StatelessWidget{
         SizedBox(width: 8,),
         Expanded( //takes whatever space is available to expand. kinda like a flexbox in css
           child: LinearProgressIndicator(
-            value: (count / _MockupUser.ratings),
+            value: (count / totalRated),
             minHeight: 6,
           )
         ),
@@ -293,7 +255,7 @@ class _Ratings extends StatelessWidget{
             for (var count in [user.stats.ratings[i]])
               //this is the only safe way for it not to complain
               if (count is int && count >= 1)
-                _RatingRow(rating: i, count: count),
+                _RatingRow(rating: i, count: count, totalRated: user.stats.totalMedia,),
                   
         ],
       ),
@@ -378,7 +340,6 @@ class _FavouritesDisplay extends StatelessWidget {
             FutureBuilder<Map<String, String>>(
               future: _loadMedia(m),
               builder: (context, snapshot) {
-                print("O snapshot tem data? ${snapshot.hasData}, e erro? ${snapshot.hasError} - ${snapshot.error}");
                 if (!snapshot.hasData) {
                   return const CircularProgressIndicator();
                 }

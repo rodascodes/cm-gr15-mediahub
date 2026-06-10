@@ -12,7 +12,7 @@ class UserServices {
 
     final media = <String, Map<String, MediaStats>>{};
 
-    //inner helper to load one collection (ex: movies)
+    //inner helper to load one collection (ex: movie)
     Future<Map<String, MediaStats>> loadCollection(String path) async {
       final snapshot = await _db.collection('users').doc(uid).collection(path).get();
 
@@ -24,16 +24,12 @@ class UserServices {
 
     final List<String> collections =
     List<String>.from(data['collections'] ?? []);
-    print("Collections has: ${collections.length}");
 
     for(String m in collections)
     {
-      print("I am inside the for loop for $m");
       media[m] = await loadCollection(m);
       if(media[m]!.isEmpty) media.remove(m); //i know its not null, look above
     }
-
-    print('MEDIA SIZE IS: ${media.length}');
     
     return AppUser(
       username: data['username'],

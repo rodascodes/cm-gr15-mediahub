@@ -1,19 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-//all the media types the app may have
-/*
-enum MediaType {
-  movies,
-  series,
-}
-*/
+//This file contains useful classes for various opeartions, but everything here is connected with the User in some way
 
 class MediaStats {
-  final int id; //id que vem do tmdb
-  final int score; 
-  final bool favorite;
-  final DateTime? addedAt;
-  final String mediaType;
+  final int id; //this is the id from tmdb
+  final int score; //the score this user has given
+  final bool favorite; //wether this work is a favorite or not
+  final DateTime? addedAt; //not really used right now, but would be cool in a potential future version
+  final String mediaType; //the type of media this work is classified as
 
   MediaStats({
     required this.id,
@@ -28,20 +22,20 @@ class MediaStats {
       id: id,
       score: data['score'] ?? 0,
       favorite: data['favorite'] ?? false,
-      addedAt: data['completedAt'] != null
-          ? (data['completedAt'] as Timestamp).toDate()
+      addedAt: data['updatedAt'] != null
+          ? (data['updatedAt'] as Timestamp).toDate()
           : null,
-      mediaType: (data['mediaType'] ?? 'Unknown'),
-      // try common keys for runtime/duration if stored in Firestore
+      mediaType: (data['mediaType'] ?? 'Unknown'), //gonna be honest here, if it ever lands on Unknown everything is cooked (I've been there myself)
     );
   }
 }
 
+//this class contains the info we need to display on the profile page
 class AppUser {
   final String name;
   final String username;
   Map<String, Map<String, MediaStats>> media; //all the media the user has consumed
-  UserStats stats;
+  UserStats stats; //this are statistics like average score and total media consumed, encapsulated in a dedicated class
 
 
 
@@ -59,10 +53,8 @@ class AppUser {
 
     for (final mediaByType in media.values)
     {
-      print("Now going through $mediaByType");
       for (final item in mediaByType.values)
       {
-        print("the item is ${item.score}");
         ratings[item.score] = (ratings[item.score] ?? 0) + 1;
         totalRating += item.score;
         totalMedia++;
@@ -70,22 +62,11 @@ class AppUser {
       }
     }
 
-      favs.sort((a, b) => b.score.compareTo(a.score)); //orders in descending order
+      favs.sort((a, b) => b.score.compareTo(a.score)); //orders in descending order, by score, this way 10/10s will apear before lower scores
 
-      // compute duration stats if available
-      /*int totalMinutes = 0;
-      int knownDurations = 0;
-      for (final mediaByType in media.values) {
-        for (final item in mediaByType.values) {
-          if (item.durationMinutes != null) {
-            totalMinutes += item.durationMinutes!;
-            knownDurations++;
-          }
-        }
-      }*/
-
-      //final int totalHours = totalMinutes ~/ 60;
-      //final double averageLengthMinutes = knownDurations > 0 ? totalMinutes / knownDurations : 0.0; //if exists at least one media with known duration, compute average, otherwise 0
+      List<MediaStats> recentlyRated = List.from(favs);
+      recentlyRated.sort((a, b) => b.addedAt!.compareTo(a.addedAt!));
+      final cutRecentlyRated = recentlyRated.sublist(0, (recentlyRated.length > 10 ? 10 : recentlyRated.length));
 
       final double averageRating = totalMedia > 0 ? (totalRating.toDouble() / totalMedia) : 0.0; //if the user has rated at least one media, compute average, otherwise 0
 
@@ -96,8 +77,7 @@ class AppUser {
         average: roundedAverage,
         totalMedia: totalMedia,
         favorites: favs,
-        totalHours: 6,
-        averageLengthMinutes: 6,
+        recentlyRated: cutRecentlyRated,
       );
   }
 
@@ -105,21 +85,19 @@ class AppUser {
 
 //helper class to store useful information about the users statisitics
 class UserStats{
-  final Map<int, int> ratings;
-  final double average;
-  final int totalMedia;
-  final List<MediaStats> favorites;
+  final Map<int, int> ratings; //maps <Score, amount> -> <10, 25> means that the user gave 25 pieces of media a 10
+  final double average; //the average rating the user has given
+  final int totalMedia; //how much media the user has consumed
+  final List<MediaStats> favorites; //a list with all of the user's favourite pieces of media
   // Total watched/listened/played time in whole hours
-  final int totalHours;
-  // Average length (minutes) of the media the user has consumed. 0 if unknown.
-  final double averageLengthMinutes;
+  //final int totalHours; //this had to be ditched
+  final List<MediaStats> recentlyRated;
 
   UserStats({
     required this.ratings,
     required this.average,
     required this.totalMedia,
     required this.favorites,
-    required this.totalHours,
-    required this.averageLengthMinutes,
+    required this.recentlyRated,
   });
 }

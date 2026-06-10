@@ -43,17 +43,36 @@ class _MoviePageState extends State<MoviePage> {
     super.initState();
     loadUserRating();
     loadFavorite();
-    print('el tipo es${widget.media.type}');
+  }
+
+  //just so I didn't have to repeat even more code, I really have to do this because of the way the Media (from mediacards) is done
+  //I am doing this a long while after already doing on the tmdb services.
+  //I believe that doing this here pretty much nullifies the need to do it in tmdb service, but I don't have the time to test
+  //so consider it a double safety measure (it had to be done here too cause even the search on firestore was also not valid since we are sending giga information)
+  String correctType(String type)
+  {
+    print("MAS EU ENTRO WTF");
+    if(type.toLowerCase().startsWith("t") && type.length >= 3)
+    {
+      //because the way the media cards are coded the type can be stored as "Tv"; "Tv Show"; or even "Tv Show 3489 comments", and this breaks the programs flow when consulting firestore
+      type = type.toLowerCase().substring(0, 2).trim();
+    }
+    else if(type.toLowerCase().startsWith('m') && type.length >= 6)
+    {
+      print("MAS EU TOU AQUI");
+      type = type.toLowerCase().substring(0, 5);
+    }
+    print("now returning $type");
+    return type.toLowerCase();
   }
 
   Future<void> loadUserRating() async {
     final uid = AuthService().currentUid;
 
-    String type = widget.media.type;
-      print('el tipo es${widget.media.type}');
-
-
     if (uid == null) return;
+
+    String type = correctType(widget.media.type);
+    print("type before search $type");
 
     final doc = await FirebaseFirestore.instance
         .collection('users')
@@ -74,17 +93,11 @@ class _MoviePageState extends State<MoviePage> {
 
     if (uid == null) return;
 
-    String type = widget.media.type.toLowerCase();
-    if(type.startsWith("t") && type.length >= 3)
-    {
-      //because the way the media cards are coded the type can be stored as "Tv"; "Tv Show"; or even "Tv Show 3489 comments", and this breaks the programs flow when consulting firestore
-      type = type.substring(0, 2).trim();
-    }
-    else if(type.startsWith('m') && type.length >= 6)
-    {
-      type = type.substring(0, 5);
-    }
+    String type = correctType(widget.media.type);
+    print("type before search $type");
+    
 
+    //saves that this user has this kind of media in his collection (ex: if its a movie then the user has movies)
     await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
@@ -92,6 +105,7 @@ class _MoviePageState extends State<MoviePage> {
         'collections': FieldValue.arrayUnion(['$type'])
     }, SetOptions(merge: true));
 
+    //saves the actual info
     await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
@@ -119,9 +133,10 @@ class _MoviePageState extends State<MoviePage> {
   {
     final uid = AuthService().currentUid;
 
-    String type = widget.media.type;
+    String type = correctType(widget.media.type);
 
     print("intializing favorite");
+    print("type before search $type");
 
 
     if (uid == null) return;
@@ -140,6 +155,7 @@ class _MoviePageState extends State<MoviePage> {
       });
     }
     else {
+      print("estou a entrar no elese");
       favorite = false;
     }
     print("So, was it favorite? $favorite");
@@ -151,18 +167,8 @@ class _MoviePageState extends State<MoviePage> {
 
     if (uid == null) return;
 
-    String type = widget.media.type.toLowerCase();
-    if(type.startsWith("t") && type.length >= 3)
-    {
-      //because the way the media cards are coded the type can be stored as "Tv"; "Tv Show"; or even "Tv Show 3489 comments", and this breaks the programs flow when consulting firestore
-      type = type.substring(0, 2).trim();
-    }
-    else if(type.startsWith('m') && type.length >= 6)
-    {
-      type = type.substring(0, 5);
-    }
-
-
+    String type = correctType(widget.media.type);
+    print("type before search $type");
 
     bool isFavorite = !favorite!;
 
