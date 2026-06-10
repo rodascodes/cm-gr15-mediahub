@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:media_hub/bottom_navbar.dart';
+import 'package:media_hub/widgets/bottom_navbar.dart';
 
 /**
  * Scaffold principal que envolve os ecrãs da bottom nav.

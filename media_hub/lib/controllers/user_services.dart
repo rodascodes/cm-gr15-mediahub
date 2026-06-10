@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:media_hub/app_util_classes.dart';
-import 'package:media_hub/services/auth_service.dart';
+import 'package:media_hub/utils/app_util_classes.dart';
+import 'package:media_hub/controllers/auth_service.dart';
 
 /**
  * Serviço de utilizador que carrega dados do utilizador do Firestore.

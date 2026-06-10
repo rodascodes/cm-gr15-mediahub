@@ -1,8 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:media_hub/app_util_classes.dart';
-import 'package:media_hub/util/tmdb_service.dart';
+import 'package:media_hub/utils/app_util_classes.dart';
+import 'package:media_hub/controllers/tmdb_service.dart';
 
 /**
  * Página que exibe uma lista de média do utilizador.

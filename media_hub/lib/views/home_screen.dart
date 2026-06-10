@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:media_hub/util/mediacard.dart';
-import '../util/tmdb_service.dart';
+import 'package:media_hub/utils/mediacard.dart';
+import '../controllers/tmdb_service.dart';
 import '../main.dart';
 
 /**
@@ -48,6 +48,10 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   Widget build(BuildContext context) {
     super.build(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    //3 variables to determine the grid layout based on screen width, for responsive reasons
+    final screenWidth = MediaQuery.of(context).size.width;
+    final crossAxisCount = screenWidth > 800 ? 4 : 2;
+    final childAspectRatio = screenWidth > 800 ? 0.85 : 0.75;
 
     return Scaffold(
       appBar: AppBar(
@@ -120,11 +124,11 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
           padding: const EdgeInsets.all(10),
 
           itemCount: trendingList.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
-            childAspectRatio: 0.75,
+            childAspectRatio: childAspectRatio,
           ),
           itemBuilder: (context, index) {
             final media = trendingList[index];

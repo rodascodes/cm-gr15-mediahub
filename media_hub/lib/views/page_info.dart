@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:media_hub/util/mediacard.dart';
+import 'package:media_hub/utils/mediacard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:media_hub/services/auth_service.dart';
+import 'package:media_hub/controllers/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:media_hub/services/notification_service.dart';
+import 'package:media_hub/controllers/notification_service.dart';
 
 
 /**

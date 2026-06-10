@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:media_hub/main.dart';
-import 'package:media_hub/services/auth_service.dart';
-import '../util/text_fields.dart';
-import '../util/app_validators.dart';
+import 'package:media_hub/controllers/auth_service.dart';
+import '../utils/text_fields.dart';
+import '../utils/app_validators.dart';
 
 /**
  * Widget que constrói os campos do formulário de registo.

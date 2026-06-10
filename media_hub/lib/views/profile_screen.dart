@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:media_hub/app_util_classes.dart';
-import 'package:media_hub/services/auth_service.dart';
-import 'package:media_hub/services/user_services.dart';
-import 'package:media_hub/util/app_colors.dart';
+import 'package:media_hub/utils/app_util_classes.dart';
+import 'package:media_hub/controllers/auth_service.dart';
+import 'package:media_hub/controllers/user_services.dart';
+import 'package:media_hub/utils/app_colors.dart';
 import 'package:go_router/go_router.dart';
-import 'package:media_hub/util/tmdb_service.dart';
+import 'package:media_hub/controllers/tmdb_service.dart';
+import '../main.dart';
 
 /**
  * Ecrã de perfil do utilizador.
@@ -15,6 +16,8 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
 
     return Scaffold(
       body: FutureBuilder<AppUser>(
@@ -35,10 +38,10 @@ class ProfileScreen extends StatelessWidget {
           return SingleChildScrollView(
             child: Column(
               children: [
-                _Header(user: user),
-                _CategorySection(user: user),
-                _Ratings(user: user),
-                _FavouritesDisplay(user: user),
+                _Header(user: user, isDark: isDark),
+                _CategorySection(user: user, isDark: isDark),
+                _Ratings(user: user, isDark: isDark),
+                _FavouritesDisplay(user: user, isDark: isDark),
               ],
             ),
           );
@@ -54,8 +57,9 @@ class ProfileScreen extends StatelessWidget {
  */
 class _StatCard extends StatelessWidget {
   final String stat, value;
+  final bool isDark;
 
-  const _StatCard({required this.stat, required this.value});
+  const _StatCard({required this.stat, required this.value, required this.isDark});
 
   @override
   Widget build(BuildContext context)
@@ -64,7 +68,7 @@ class _StatCard extends StatelessWidget {
       width: 70,
       padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
+        color: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -83,12 +87,14 @@ class _StatCard extends StatelessWidget {
  */
 class _Header extends StatelessWidget {
   final AppUser user;
+  final bool isDark;
   
-  const _Header({required this.user});
+  const _Header({required this.user, required this.isDark});
 
   @override
   Widget build(BuildContext context)
   {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: EdgeInsets.fromLTRB(16, 48, 16, 16), //LTRB = Left, Top, Right, Bottom
       decoration: BoxDecoration(
@@ -96,7 +102,8 @@ class _Header extends StatelessWidget {
           colors: [AppColors.profileHeaderG1, AppColors.profileHeaderG2,],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-        )
+        ),
+        color: isDark ? Theme.of(context).cardColor : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,13 +111,18 @@ class _Header extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(user.name, style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-              GestureDetector(
-                child: Icon(Icons.logout_outlined, color: Colors.black),
-                onTap: () {
-                  AuthService().logout();
-                  context.go('/login');
-                },
+              Text(user.name, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+              
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.logout_outlined, color: Colors.white),
+                    onPressed: () {
+                      AuthService().logout();
+                      context.go('/login');
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -120,8 +132,8 @@ class _Header extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 16,
             children: [
-              _StatCard(value: "${user.stats.totalMedia}", stat: "Ratings"),
-              _StatCard(value: "${user.stats.average}", stat: "Avg. Score"),
+              _StatCard(value: "${user.stats.totalMedia}", stat: "Ratings", isDark: isDark),
+              _StatCard(value: "${user.stats.average}", stat: "Avg. Score", isDark: isDark),
               //there was no time to implement the rest
             ],
           ),
@@ -138,11 +150,13 @@ class _CategoryCard extends StatelessWidget {
   final IconData icon;
   final String mediaType;
   final int numberWatched;
+  final bool isDark;
 
   const _CategoryCard({
     required this.icon,
     required this.mediaType,
     required this.numberWatched,
+    required this.isDark,
   });
 
 
@@ -153,14 +167,17 @@ class _CategoryCard extends StatelessWidget {
       width: 100,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.grey.shade200,
+        color: isDark
+          ? Theme.of(context).cardColor
+          : Colors.grey.shade200,
+
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
           Icon(icon, color: Colors.purple),
           const SizedBox(height: 8),
-          Text("$numberWatched",style: const TextStyle(fontWeight: FontWeight.bold),
+          Text("$numberWatched",style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black,),
           ),
           Text(mediaType),
         ],
@@ -180,7 +197,8 @@ class _CategorySection extends StatelessWidget{
   };
 
   final AppUser user;
-  const _CategorySection({required this.user});
+  final bool isDark;
+  const _CategorySection({required this.user, required this.isDark});
 
   String capitalizeString(String word)
   {
@@ -195,9 +213,9 @@ class _CategorySection extends StatelessWidget{
     return Padding(
       padding: EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center, //for the text "Categories" to be centered
         children: [
-          Text("Categories", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text("Categories", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black,)),
           SizedBox(height: 12),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -227,6 +245,7 @@ class _CategorySection extends StatelessWidget{
                               ? '${mediaType[0].toUpperCase()}${mediaType.substring(1)}' //i dont want TV to be Tvs
                               : '${mediaType[0].toUpperCase()}${mediaType.substring(1)}s',
                           numberWatched: user.media[mediaType]?.length ?? 0,
+                          isDark: isDark,
                         ),
                       ),  
                     ],
@@ -249,8 +268,8 @@ class _RatingRow extends StatelessWidget{
   final int rating;
   final int count;
   final int totalRated;
-  
-  const _RatingRow({required this.rating, required this.count, required this.totalRated});
+  final bool isDark;
+  const _RatingRow({required this.rating, required this.count, required this.totalRated, required this.isDark});
 
   @override
   Widget build(BuildContext context)
@@ -276,7 +295,8 @@ class _RatingRow extends StatelessWidget{
  */
 class _Ratings extends StatelessWidget{
   final AppUser user;
-  const _Ratings({required this.user});
+  final bool isDark;
+  const _Ratings({required this.user, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -288,7 +308,7 @@ class _Ratings extends StatelessWidget{
             for (var count in [user.stats.ratings[i]])
               //this is the only safe way for it not to complain
               if (count is int && count >= 1)
-                _RatingRow(rating: i, count: count, totalRated: user.stats.totalMedia,),
+                _RatingRow(rating: i, count: count, totalRated: user.stats.totalMedia, isDark: isDark),
                   
         ],
       ),
@@ -303,8 +323,9 @@ class _Favourite extends StatelessWidget{
   final String title, mediaType, image;
   final String? rating;
   final int id;
+  final bool isDark;
 
-  const _Favourite({required this.title, required this.mediaType, required this.rating, required this.image, required this.id});
+  const _Favourite({required this.title, required this.mediaType, required this.rating, required this.image, required this.id, required this.isDark});
 
   @override
   Widget build(BuildContext context)
@@ -321,7 +342,7 @@ class _Favourite extends StatelessWidget{
         margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         padding: EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.purple.shade50,
+          color: isDark ? Theme.of(context).cardColor : Colors.purple.shade50,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -344,7 +365,7 @@ class _Favourite extends StatelessWidget{
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title),
-                  Text(mediaType, style: TextStyle(color: Colors.grey)),
+                  Text(mediaType, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87,)),
                 ],
               ),
             ),
@@ -361,7 +382,8 @@ class _Favourite extends StatelessWidget{
 
 class _FavouritesDisplay extends StatelessWidget {
   final AppUser user;
-  const _FavouritesDisplay({required this.user});
+  final bool isDark;
+  const _FavouritesDisplay({required this.user, required this.isDark});
 
   Future<Map<String, String>> _loadMedia(MediaStats m) {
     return TmdbService().getTitleAndPoster(m.id, m.mediaType);
@@ -388,6 +410,7 @@ class _FavouritesDisplay extends StatelessWidget {
                   image: data['posterUrl'] ?? '',
                   id: m.id,
                   rating: m.score.toString(),
+                  isDark: isDark,
                 );
               },
             ),

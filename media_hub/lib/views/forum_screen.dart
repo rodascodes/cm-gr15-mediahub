@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:media_hub/util/app_colors.dart';
-import 'package:media_hub/util/mediacard.dart';
-import '../util/tmdb_service.dart';
+import 'package:media_hub/utils/app_colors.dart';
+import 'package:media_hub/utils/mediacard.dart';
+import '../controllers/tmdb_service.dart';
 import '../main.dart';
 
 // ─── Data models ────────────────────────────────────────────────────────────

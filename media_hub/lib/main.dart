@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:media_hub/routes.dart';
-import 'util/app_colors.dart';
+import 'utils/app_colors.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'services/notification_service.dart';
+import 'config/firebase_options.dart';
+import 'controllers/notification_service.dart';
 
 /**
  * Notifier global que controla o tema da aplicação (claro/escuro).

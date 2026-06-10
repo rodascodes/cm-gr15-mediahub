@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:media_hub/app_util_classes.dart';
-import '../util/mediacard.dart';
+import 'package:media_hub/utils/app_util_classes.dart';
+import '../utils/mediacard.dart';
 
 
 /**

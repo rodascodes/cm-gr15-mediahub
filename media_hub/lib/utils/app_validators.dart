@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 /**
  * Classe com validadores para formulários da aplicação.
  * Valida email, senha, username e confirmação de senha.

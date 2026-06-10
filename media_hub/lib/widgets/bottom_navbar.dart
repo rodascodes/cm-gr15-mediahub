@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:media_hub/util/app_colors.dart';
+import 'package:media_hub/utils/app_colors.dart';
 
 /**
  * Barra de navegação inferior personalizada com 4 abas.
