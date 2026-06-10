@@ -197,7 +197,6 @@ class TmdbService {
     {
       mediaList.add(await getMediaFromId(m.id, m.mediaType));
     }
-    print("recebi ${mslist.length}, e tou a enviar ${mediaList.length}");
     return mediaList;
   }
 }
