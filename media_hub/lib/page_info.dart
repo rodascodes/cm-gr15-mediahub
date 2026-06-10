@@ -51,7 +51,6 @@ class _MoviePageState extends State<MoviePage> {
   //so consider it a double safety measure (it had to be done here too cause even the search on firestore was also not valid since we are sending giga information)
   String correctType(String type)
   {
-    print("MAS EU ENTRO WTF");
     if(type.toLowerCase().startsWith("t") && type.length >= 3)
     {
       //because the way the media cards are coded the type can be stored as "Tv"; "Tv Show"; or even "Tv Show 3489 comments", and this breaks the programs flow when consulting firestore
@@ -59,10 +58,8 @@ class _MoviePageState extends State<MoviePage> {
     }
     else if(type.toLowerCase().startsWith('m') && type.length >= 6)
     {
-      print("MAS EU TOU AQUI");
       type = type.toLowerCase().substring(0, 5);
     }
-    print("now returning $type");
     return type.toLowerCase();
   }
 
@@ -72,7 +69,6 @@ class _MoviePageState extends State<MoviePage> {
     if (uid == null) return;
 
     String type = correctType(widget.media.type);
-    print("type before search $type");
 
     final doc = await FirebaseFirestore.instance
         .collection('users')
@@ -94,7 +90,6 @@ class _MoviePageState extends State<MoviePage> {
     if (uid == null) return;
 
     String type = correctType(widget.media.type);
-    print("type before search $type");
     
 
     //saves that this user has this kind of media in his collection (ex: if its a movie then the user has movies)
@@ -102,7 +97,7 @@ class _MoviePageState extends State<MoviePage> {
         .collection('users')
         .doc(uid)
         .set({
-        'collections': FieldValue.arrayUnion(['$type'])
+        'collections': FieldValue.arrayUnion([type])
     }, SetOptions(merge: true));
 
     //saves the actual info
@@ -135,10 +130,6 @@ class _MoviePageState extends State<MoviePage> {
 
     String type = correctType(widget.media.type);
 
-    print("intializing favorite");
-    print("type before search $type");
-
-
     if (uid == null) return;
 
     final doc = await FirebaseFirestore.instance
@@ -155,10 +146,8 @@ class _MoviePageState extends State<MoviePage> {
       });
     }
     else {
-      print("estou a entrar no elese");
       favorite = false;
     }
-    print("So, was it favorite? $favorite");
   }
 
   Future<void> toggleFavorite() async
@@ -168,7 +157,6 @@ class _MoviePageState extends State<MoviePage> {
     if (uid == null) return;
 
     String type = correctType(widget.media.type);
-    print("type before search $type");
 
     bool isFavorite = !favorite!;
 
@@ -176,7 +164,7 @@ class _MoviePageState extends State<MoviePage> {
         .collection('users')
         .doc(uid)
         .set({
-        'collections': FieldValue.arrayUnion(['$type'])
+        'collections': FieldValue.arrayUnion([type])
     }, SetOptions(merge: true));
 
     await FirebaseFirestore.instance
