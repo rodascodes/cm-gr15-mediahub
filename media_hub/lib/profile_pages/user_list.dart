@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:media_hub/app_util_classes.dart';
 import 'package:media_hub/util/tmdb_service.dart';
 
+/**
+ * Página que exibe uma lista de média do utilizador.
+ * Mostra detalhes como título, cartaz e avaliação.
+ */
 class UserList extends StatefulWidget {
   final String title;
   final Map<String, MediaStats> mediaStatsList;
@@ -14,6 +18,10 @@ class UserList extends StatefulWidget {
   State<StatefulWidget> createState() => UserListState();
 }
 
+/**
+ * Estado da página de lista do utilizador.
+ * Carrega e exibe média com suas respectivas avaliações.
+ */
 class UserListState extends State<UserList> {
   @override
   Widget build(BuildContext context) {

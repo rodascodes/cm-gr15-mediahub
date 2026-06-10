@@ -3,12 +3,20 @@ import 'package:media_hub/util/mediacard.dart';
 import '../util/tmdb_service.dart';
 import '../main.dart';
 
+/**
+ * Ecrã principal da aplicação que exibe média em tendência.
+ * Mostra filmes e séries populares de forma interleaved.
+ */
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+/**
+ * Estado da página home.
+ * Carrega e exibe média em tendência, mantendo o estado durante a navegação.
+ */
 class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin {
   
   @override
@@ -81,6 +89,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                 'Trending',
                 style: TextStyle(
                   fontSize: 20,
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -128,37 +137,6 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
       return const SizedBox.shrink(); 
     },
   ),
-            Padding(
-              padding: EdgeInsets.only(
-                left: 16.0,
-                top: 12.0,
-                right: 16.0,
-                bottom: 8.0,
-              ),
-              child: Text(
-                'Recommended',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(
-                left: 16.0,
-                top: 12.0,
-                right: 16.0,
-                bottom: 8.0,
-              ),
-              child: Text(
-                'Classified Recently',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
           ],
         ),
       ),

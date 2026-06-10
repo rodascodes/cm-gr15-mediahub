@@ -16,6 +16,13 @@ import 'package:media_hub/util/mediacard.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
+/**
+ * Configuração central de todas as rotas da aplicação usando GoRouter.
+ * Usa uma [ShellRoute] para manter o [MainScaffold] (com a bottom nav bar)
+ * ativo nas rotas principais, enquanto rotas como /login, /register e /info
+ * ficam fora da shell e não mostram a barra inferior.
+ * O [initialLocation] é determinado dinamicamente: se não houver utilizador autenticado, redireciona para /login; caso contrário, para /home.
+ */
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: AuthService().currentUser == null ? '/login' : '/home',

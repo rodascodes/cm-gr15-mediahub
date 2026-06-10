@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+/**
+ * Serviço de autenticação que gerencia login, registo e logout.
+ * Utiliza Firebase Authentication como backend.
+ */
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 

@@ -5,6 +5,10 @@ import '../util/text_fields.dart';
 import '../util/app_validators.dart';
 import '../services/auth_service.dart';
 
+/**
+ * Widget que constrói os campos do formulário de login.
+ * Inclui campos de email e password.
+ */
 class _LoginFields extends StatelessWidget {
   final TextEditingController emailController;
   final TextEditingController passwordController;
@@ -41,7 +45,6 @@ class _LoginFields extends StatelessWidget {
           hintText: 'Password',
           prefixIcon: Icons.lock_outlined,
           isPassword: true,
-          //Login doesn't require the same password complexity as registration, so we only check if it's not empty
           validator: AppValidators.validateNonEmptyPassword,
         ),
 
@@ -54,7 +57,7 @@ class _LoginFields extends StatelessWidget {
               if (Form.of(context).validate()) {
                 try {
                   await AuthService().login(emailController.text, passwordController.text);
-                  if(!context.mounted) return; //if this widget was for some reason removed from the widget tree, returns. this can happen if the widget has been disposed during the async operation (putting this here avoids warnings)
+                  if(!context.mounted) return;
                   context.go('/home');
                 }
                 catch (e)
@@ -83,6 +86,10 @@ class _LoginFields extends StatelessWidget {
   }
 }
 
+/**
+ * Formulário de login encapsulado em StatefulWidget.
+ * Gerencia validacão e estado do formulário.
+ */
 class _LoginForm extends StatefulWidget {
   const _LoginForm();
   
@@ -90,6 +97,10 @@ class _LoginForm extends StatefulWidget {
   State<_LoginForm> createState() => _LoginFormState();
 }
 
+/**
+ * Estado do formulário de login.
+ * Gerencia os controladores de texto e a validação.
+ */
 class _LoginFormState extends State<_LoginForm> {
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
 
@@ -109,6 +120,10 @@ class _LoginFormState extends State<_LoginForm> {
   }
 }
 
+/**
+ * Ecrã de login da aplicação.
+ * Exibe formulário de autenticação com suporte a tema claro/escuro.
+ */
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
   

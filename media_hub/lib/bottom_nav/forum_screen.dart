@@ -6,6 +6,10 @@ import '../main.dart';
 
 // ─── Data models ────────────────────────────────────────────────────────────
 
+/**
+ * Modelo de dados para um tópico de fórum.
+ * Contém informações sobre tít ulo, autor, categoria e eng ajamento.
+ */
 class _ForumTopic {
   final String title;
   final String author;
@@ -58,12 +62,20 @@ final List<_ForumTopic> _recentTopics = [
 ];
 
 // ─── Main page ───────────────────────────────────────────────────────────────
+/**
+ * Ecrã do fórum com tópicos e média mais discutida.
+ */
 class ForumPage extends StatefulWidget {
   const ForumPage({super.key});
   @override
   State<ForumPage> createState() => _ForumPageState();
 }
-  class _ForumPageState extends State<ForumPage> with AutomaticKeepAliveClientMixin{
+
+/**
+ * Estado do ecrã do fórum.
+ * Carrega e exibe média mais discutida e tópicos recentes.
+ */
+class _ForumPageState extends State<ForumPage> with AutomaticKeepAliveClientMixin{
 
   @override
   bool get wantKeepAlive => true;

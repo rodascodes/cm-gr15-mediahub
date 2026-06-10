@@ -4,11 +4,22 @@ import 'package:media_hub/app_util_classes.dart';
 import '../util/mediacard.dart';
 
 
+/**
+ * Serviço que interage com a API do TMDB (The Movie Database).
+ * Fornece métodos para obter filmes, séries, pesquisar e obter detalhes.
+ */
 class TmdbService {
   static const String _apiKey = '69c1a1a1441bdb5f8aa143d1019f1103'; 
   static const String _baseUrl = 'https://api.themoviedb.org/3';
   static const String _movieType = '/movie';
 
+  /**
+   * Obtém média em tendência (trending).
+   * 
+   * @param type O tipo de média ('/movie' ou '/tv')
+   * @return Lista de média em tendência
+   * @throws Exception se houver erro na comunicação com a TMDB
+   */
   Future<List<Media>> getTrending(String type) async {
     final url = Uri.parse('$_baseUrl/trending$type/day?api_key=$_apiKey&language=pt-PT');
     
@@ -39,6 +50,13 @@ class TmdbService {
     }
   }
 
+  /**
+   * Pesquisa média por palavra-chave na TMDB.
+   * 
+   * @param query A palavra-chave a pesquisar
+   * @return Lista de média encontrada
+   * @throws Exception se houver erro na comunicação com a TMDB
+   */
   Future<List<Media>> search(String query) async {
     final url = Uri.parse('$_baseUrl/search/multi?api_key=$_apiKey&language=pt-PT&query=$query');
     
@@ -73,6 +91,13 @@ class TmdbService {
     }
   }
 
+  /**
+   * Obtém a média mais discutida (com mais votos).
+   * Combina filmes e séries ordenados por número de comentários.
+   * 
+   * @return Lista de média mais discutida
+   * @throws Exception se houver erro na comunicação com a TMDB
+   */
   Future<List<Media>> getMostDiscussed() async {
   final movieUrl = Uri.parse('$_baseUrl/discover/movie?api_key=$_apiKey&language=pt-PT&sort_by=vote_count.desc');
   final tvUrl = Uri.parse('$_baseUrl/discover/tv?api_key=$_apiKey&language=pt-PT&sort_by=vote_count.desc');
@@ -127,7 +152,15 @@ class TmdbService {
     }
   }
 
-  //gets the title and poster of a given media; useful in favorites section on profile
+  /**
+   * Obtém o título e poster de um filme/série pelo ID.
+   * Útil para a seção de favoritos no perfil.
+   * 
+   * @param id O ID da média no TMDB
+   * @param mediaType O tipo de média ('movie', 'tv', etc)
+   * @return Mapa com 'title' e 'posterUrl'
+   * @throws Exception se a média não for encontrada
+   */
   Future<Map<String, String>> getTitleAndPoster(int id, String mediaType) async {
     //have to do this because of the way things were coded, tv can be "TV"; "TV Shows"; or "TV Show 3465 comments"
     //since tmdb search requires the mediatype to either be "movie" or "tv" in the url's formation, I had to format whatever I was getting here so it doens't break
@@ -156,7 +189,14 @@ class TmdbService {
     throw Exception('Title not found');
   }
 
-  //gets media from tmdb by id; also requires what is the media type because tv and movie behave differently
+  /**
+   * Obtém os detalhes completos de uma média pelo ID.
+   * 
+   * @param id O ID da média no TMDB
+   * @param mediaType O tipo de média ('movie', 'tv', etc)
+   * @return Objeto [Media] com todos os detalhes
+   * @throws Exception se a média não for encontrada
+   */
   Future<Media> getMediaFromId(int id, String mediaType) async
   {
     //already explained this in the function before this one, it's so the url is valid for tmdb checkup
@@ -190,6 +230,13 @@ class TmdbService {
     throw Exception("It's joever");
   }
 
+  /**
+   * Obtém uma lista de média a partir de uma lista de [MediaStats].
+   * Usado para carregar detalhes completos das médias avaliadas.
+   * 
+   * @param mslist Lista de estatísticas de média
+   * @return Lista de objetos [Media] com detalhes completos
+   */
   Future<List<Media>> getMediaListFromMediaStatsList(List<MediaStats> mslist) async
   {
     List<Media> mediaList = [];

@@ -2,9 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:media_hub/app_util_classes.dart';
 import 'package:media_hub/services/auth_service.dart';
 
+/**
+ * Serviço de utilizador que carrega dados do utilizador do Firestore.
+ * Inclui coleções de mídia e estatísticas do utilizador.
+ */
 class UserServices {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  /**
+   * Carrega os dados completos do utilizador autenticado.
+   * Inclui informações pessoais, coleções de mídia e medidas.
+   * 
+   * @return [AppUser] com todos os dados do utilizador
+   */
   Future<AppUser> getUser() async {
     final uid = AuthService().currentUid;
     final userDoc = await _db.collection('users').doc(uid).get();

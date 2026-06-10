@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
-// Class to store the colors to be used. Makes it simpler to change colors long term.
+/**
+ * Classe que armazena as cores utilizadas em toda a aplicação.
+ * Facilita a manutenção e alteração de cores de forma centralizada.
+ */
 class AppColors {
   static const Color primary = Color.fromARGB(255, 119, 0, 255); 
   static const Color hintText = Color(0xFF9E9E9E);

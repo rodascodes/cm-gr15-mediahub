@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+/**
+ * Cartão de mýdia exibido em grid.
+ * Mostra imagem de capa, título, tipo e classificação.
+ */
 class MediaCard extends StatelessWidget {
   final Media media;
 
@@ -62,6 +66,10 @@ class MediaCard extends StatelessWidget {
   }
 }
 
+/**
+ * Cartão de mýdia horizontal para listas.
+ * Exibe imagem, título, tipo e classificação lado a lado.
+ */
 class HorizontalMediaCard extends StatelessWidget {
   final Media media;
 
@@ -120,6 +128,10 @@ class HorizontalMediaCard extends StatelessWidget {
   }
 }
 
+/**
+ * Avatar circular com iniciais do nome do utilizador.
+ * Exibido em comentários e tópicos de fórum.
+ */
 class AvatarCircle extends StatelessWidget {
   final String name;
 
@@ -148,6 +160,10 @@ class AvatarCircle extends StatelessWidget {
   }
 }
 
+/**
+ * Cartão de tópico de fórum.
+ * Apresenta título, autor, categoria, tempo e engajamento (comentários e gostos).
+ */
 class TopicCard extends StatelessWidget {
   final String title;
   final String author;
@@ -237,7 +253,10 @@ class TopicCard extends StatelessWidget {
   }
 }
 
-
+/**
+ * Modelo de dados para m\u00e9dia (filme, s\u00e9rie, etc).
+ * Cont\u00e9m informa\u00e7\u00f5es obtidas do TMDB.
+ */
 class Media {
   final int id;
 

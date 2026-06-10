@@ -6,6 +6,10 @@ import 'package:media_hub/util/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:media_hub/util/tmdb_service.dart';
 
+/**
+ * Ecrã de perfil do utilizador.
+ * Exibe informações pessoais, estatísticas, classificações e favoritos.
+ */
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -44,7 +48,10 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-//stat cards to be used on header with information about user ratings , average rating, etc
+/**
+ * Cartão que exibe uma estatística do utilizador.
+ * Mostra valor e rótulo da estatística.
+ */
 class _StatCard extends StatelessWidget {
   final String stat, value;
 
@@ -71,6 +78,9 @@ class _StatCard extends StatelessWidget {
   }
 }
 
+/**
+ * Cabeçalho do perfil com informações do utilizador e botão de logout.
+ */
 class _Header extends StatelessWidget {
   final AppUser user;
   
@@ -121,6 +131,9 @@ class _Header extends StatelessWidget {
   }
 }
 
+/**
+ * Cartão que exibe uma categoria de média (filmes, séries, etc) com contagem.
+ */
 class _CategoryCard extends StatelessWidget {
   final IconData icon;
   final String mediaType;
@@ -156,6 +169,9 @@ class _CategoryCard extends StatelessWidget {
   }
 }
 
+/**
+ * Seção que exibe as categorias de média do utilizador.
+ */
 class _CategorySection extends StatelessWidget{
   static const Map<String, IconData> icons = {
     "movie": Icons.movie,
@@ -226,6 +242,9 @@ class _CategorySection extends StatelessWidget{
   }
 }
 
+/**
+ * Linha de classificação que mostra o número de médias com cada nota.
+ */
 class _RatingRow extends StatelessWidget{
   final int rating;
   final int count;
@@ -252,6 +271,9 @@ class _RatingRow extends StatelessWidget{
   }
 }
 
+/**
+ * Seção que exibe a distribuição de classificações do utilizador.
+ */
 class _Ratings extends StatelessWidget{
   final AppUser user;
   const _Ratings({required this.user});
@@ -274,6 +296,9 @@ class _Ratings extends StatelessWidget{
   }
 }
 
+/**
+ * Widget que exibe um item favorito com detalhes e avaliação.
+ */
 class _Favourite extends StatelessWidget{
   final String title, mediaType, image;
   final String? rating;

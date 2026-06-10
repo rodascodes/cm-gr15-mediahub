@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+/**
+ * Página que exibe uma coleção de média com título personalizado.
+ * Mostra cada item com imagem de cartaz e detalhes.
+ */
 class MediaCollectionPage extends StatelessWidget {
   final String title;
   final List<Map<String, dynamic>> items;

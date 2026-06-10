@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:media_hub/util/app_colors.dart';
 
+/**
+ * Barra de navegação inferior personalizada com 4 abas.
+ * Exibe Home, Pesquisa, Fórum e Perfil.
+ */
+
 class CustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onItemTapped;

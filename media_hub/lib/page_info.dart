@@ -7,6 +7,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:media_hub/services/notification_service.dart';
 
 
+/**
+ * Representa um comentário de um utilizador sobre um filme ou série.
+ * Contém informações do autor, texto do comentário, avaliação e data.
+ */
 class MovieComment {
   final String username;
   final String comment;
@@ -21,7 +25,10 @@ class MovieComment {
   });
 }
 
-
+/**
+ * Widget que apresenta a página de detalhes de um filme ou série.
+ * Permite visualizar informações, adicionar classificações, comentários e marcar como favorito.
+ */
 class MoviePage extends StatefulWidget {
   final Media media;
 
@@ -34,6 +41,10 @@ class MoviePage extends StatefulWidget {
   State<MoviePage> createState() => _MoviePageState();
 }
 
+/**
+ * Estado da página de detalhes do filme.
+ * Gerencia classificações, favoritos, comentários e interações com Firestore.
+ */
 class _MoviePageState extends State<MoviePage> {
   int? selectedRating;
   bool? favorite;
@@ -45,10 +56,13 @@ class _MoviePageState extends State<MoviePage> {
     loadFavorite();
   }
 
-  //just so I didn't have to repeat even more code, I really have to do this because of the way the Media (from mediacards) is done
-  //I am doing this a long while after already doing on the tmdb services.
-  //I believe that doing this here pretty much nullifies the need to do it in tmdb service, but I don't have the time to test
-  //so consider it a double safety measure (it had to be done here too cause even the search on firestore was also not valid since we are sending giga information)
+  /**
+   * Converte o tipo de mídia para o formato correto usado no Firestore.
+   * Normaliza variações como "TV", "TV Show", "Movie", etc.
+   * 
+   * @param type O tipo de mídia a ser corrigido
+   * @return O tipo de mídia normalizado em minúsculas
+   */
   String correctType(String type)
   {
     if(type.toLowerCase().startsWith("t") && type.length >= 3)
@@ -63,6 +77,10 @@ class _MoviePageState extends State<MoviePage> {
     return type.toLowerCase();
   }
 
+  /**
+   * Carrega a classificação do utilizador para o filme/série atual do Firestore.
+   * Atualiza o estado com a classificação encontrada.
+   */
   Future<void> loadUserRating() async {
     final uid = AuthService().currentUid;
 
@@ -84,6 +102,12 @@ class _MoviePageState extends State<MoviePage> {
     }
   }
 
+  /**
+   * Guarda a classificação do utilizador no Firestore.
+   * Também atualiza a coleção de mídia do utilizador e exibe uma notificação.
+   * 
+   * @param rating A classificação a guardar (1-10)
+   */
   Future<void> saveRating(int rating) async {
     final uid = AuthService().currentUid;
 
@@ -124,6 +148,10 @@ class _MoviePageState extends State<MoviePage> {
     );
   }
 
+  /**
+   * Carrega o estado de favorito do filme/série do Firestore.
+   * Atualiza o estado com o valor encontrado ou define como não favorito se não existir.
+   */
   Future<void> loadFavorite() async
   {
     final uid = AuthService().currentUid;
@@ -150,6 +178,10 @@ class _MoviePageState extends State<MoviePage> {
     }
   }
 
+  /**
+   * Alterna o estado de favorito do filme/série e guarda no Firestore.
+   * Exibe uma notificação informando o utilizador sobre a ação realizada.
+   */
   Future<void> toggleFavorite() async
   {
     final uid = AuthService().currentUid;
@@ -194,6 +226,7 @@ class _MoviePageState extends State<MoviePage> {
 
   final TextEditingController _commentController = TextEditingController();
 
+  /// Lista de comentários adicionados ao filme/série
   List<MovieComment> comments = [
     MovieComment(
       username: "Pedro",
@@ -210,8 +243,10 @@ class _MoviePageState extends State<MoviePage> {
     ),
   ];
 
-
-
+  /**
+   * Adiciona um novo comentário à lista de comentários.
+   * Valida que o comentário não está vazio e exibe uma notificação de sucesso.
+   */
   void addComment() {
     if (_commentController.text.trim().isEmpty) return;
 
@@ -235,9 +270,10 @@ class _MoviePageState extends State<MoviePage> {
   );
   }
 
-
-
-
+  /**
+   * Constrói a interface da página de detalhes do filme/série.
+   * Apresenta informações, galeria de imagens, classificação, favoritos e comentários.
+   */
   @override
   Widget build(BuildContext context) {
     return Scaffold(

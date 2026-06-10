@@ -5,6 +5,10 @@ import 'package:media_hub/services/auth_service.dart';
 import '../util/text_fields.dart';
 import '../util/app_validators.dart';
 
+/**
+ * Widget que constrói os campos do formulário de registo.
+ * Inclui username, nome, email, senha e confirmação de senha.
+ */
 class _RegisterFields extends StatelessWidget {
   final TextEditingController usernameController;
   final TextEditingController nameController;
@@ -115,6 +119,10 @@ class _RegisterForm extends StatefulWidget {
   State<_RegisterForm> createState() => _RegisterFormState();
 }
 
+/**
+ * Estado do formulário de registo.
+ * Gerencia os controladores de texto, validação e cria novo utilizador.
+ */
 class _RegisterFormState extends State<_RegisterForm> {
 
   final GlobalKey<FormState> _registerFormKey = GlobalKey<FormState>();
@@ -138,6 +146,10 @@ class _RegisterFormState extends State<_RegisterForm> {
     );
   }
 }
+/**
+ * Ecrã de registo da aplicação.
+ * Exibe formulário para criar nova conta de utilizador.
+ */
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
   

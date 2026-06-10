@@ -1,7 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-//This file contains useful classes for various opeartions, but everything here is connected with the User in some way
+/**
+ * Contém classes úteis relacionadas com o utilizador e média.
+ * Inclui informações de avaliação, favoritos e estatísticas.
+ */
 
+/**
+ * Modelo de dados para as estatísticas de uma média avaliada pelo utilizador.
+ * Armazena ID, pontuação, favorito e tipo de média.
+ */
 class MediaStats {
   final int id; //this is the id from tmdb
   final int score; //the score this user has given
@@ -17,6 +24,13 @@ class MediaStats {
     required this.mediaType,
   });
 
+  /**
+   * Cria uma instância [MediaStats] a partir de dados do Firestore.
+   * 
+   * @param id O ID da média
+   * @param data O mapa de dados do documento Firestore
+   * @return Nova instância de [MediaStats]
+   */
   factory MediaStats.fromFirestore(int id, Map<String, dynamic> data) {
     return MediaStats(
       id: id,
@@ -30,7 +44,10 @@ class MediaStats {
   }
 }
 
-//this class contains the info we need to display on the profile page
+/**
+ * Modelo de dados para um utilizador da aplicação.
+ * Contém informações pessoais, coleções de média e estatísticas.
+ */
 class AppUser {
   final String name;
   final String username;
@@ -41,6 +58,13 @@ class AppUser {
 
   AppUser({required this.name, required this.username, required this.media}) : stats = getStats(media);
 
+  /**
+   * Calcula as estatísticas do utilizador a partir das suas coleções de média.
+   * Inclui médias total, pontuação média, favoritos e recentes.
+   * 
+   * @param media Mapa com todas as coleções de média do utilizador
+   * @return Objeto [UserStats] com as estatísticas calculadas
+   */
   static UserStats getStats(Map<String, Map<String, MediaStats>> media)
   {
     final ratings = {
@@ -83,7 +107,10 @@ class AppUser {
 
 }
 
-//helper class to store useful information about the users statisitics
+/**
+ * Classe auxiliar que armazena informações úteis sobre as estatísticas do utilizador.
+ * Inclui distribuição de pontuações, média, total e favoritos.
+ */
 class UserStats{
   final Map<int, int> ratings; //maps <Score, amount> -> <10, 25> means that the user gave 25 pieces of media a 10
   final double average; //the average rating the user has given

@@ -5,8 +5,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'services/notification_service.dart';
 
+/**
+ * Notifier global que controla o tema da aplicação (claro/escuro).
+ * Qualquer widget pode alterar o tema chamando [themeNotifier.value = ThemeMode.dark].
+ */
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
+/// Entry point da aplicação.
+/// Inicializa o Firebase antes de lançar a app para garantir que
+/// os serviços (Auth, Firestore) estão disponíveis desde o arranque.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -18,6 +25,10 @@ void main() async {
   runApp(const MainApp());
 }
 
+/**
+ * Widget raiz da aplicação MediaHub.
+ * Configura tema, roteamento e suporte a alteração de tema em tempo real.
+ */
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+/**
+ * Campo de texto personalizado com suporte a ikon, máscara de senha e validação.
+ */
 class TextFields extends StatefulWidget {
   final String hintText;
   final IconData prefixIcon;
@@ -23,6 +26,10 @@ class TextFields extends StatefulWidget {
   State<TextFields> createState() => _TextFieldsState();
 }
 
+/**
+ * Estado do campo de texto personalizado.
+ * Gerencia a visibilidade da senha e renderiza o campo com estilos customizados.
+ */
 class _TextFieldsState extends State<TextFields> {
   late bool _hideText;
 

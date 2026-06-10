@@ -3,7 +3,10 @@ import 'package:media_hub/util/mediacard.dart';
 import '../util/tmdb_service.dart';
 import '../main.dart';
 
-
+/**
+ * Ecrã de pesquisa de média (filmes e séries).
+ * Permite filtrar por categoria e pesquisar por palavra-chave.
+ */
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
 
@@ -11,6 +14,10 @@ class SearchPage extends StatefulWidget {
   State<SearchPage> createState() => _SearchPageState();
 }
 
+/**
+ * Estado do ecrã de pesquisa.
+ * Gerencia a pesquisa e filtragem de média por categoria.
+ */
 class _SearchPageState extends State<SearchPage> with AutomaticKeepAliveClientMixin {
   
   @override
@@ -33,6 +40,7 @@ class _SearchPageState extends State<SearchPage> with AutomaticKeepAliveClientMi
     _currentMediaFuture = _getMedia('');
   }
 
+  /// Obtém a lista de média baseada na pesquisa e categoria selecionada
   Future<List<Media>> _getMedia(String query) async {
     if (query.isEmpty) {
       if (_selectedCategory == 'Movies') {
@@ -55,6 +63,9 @@ class _SearchPageState extends State<SearchPage> with AutomaticKeepAliveClientMi
     return results;
   }
 
+  /**
+   * Atualiza a lista de média exibida com base no texto de pesquisa.
+   */
   void _updateSearch() {
     setState(() {
       _currentMediaFuture = _getMedia(_searchController.text.trim());
@@ -216,6 +227,8 @@ class _SearchPageState extends State<SearchPage> with AutomaticKeepAliveClientMi
 }
 
 class CategoryButton extends StatelessWidget {
+  /// Ótão de categoria com gradient condicional
+  /// Representa um filtro de categoria (Filmes, Séries, Todos)
   final String text;
   final List<Color> colors;
   final VoidCallback? onPressed;

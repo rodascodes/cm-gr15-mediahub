@@ -1,4 +1,16 @@
+import 'package:flutter/material.dart';
+
+/**
+ * Classe com validadores para formulários da aplicação.
+ * Valida email, senha, username e confirmação de senha.
+ */
 class AppValidators {
+  /**
+   * Valida um endereço de email.
+   * 
+   * @param value O email a validar
+   * @return Uma mensagem de erro ou null se válido
+   */
   static String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please insert your email';
@@ -11,6 +23,13 @@ class AppValidators {
     return null;
   }
 
+  /**
+   * Valida uma senha com critérios de segurança.
+   * Requer: mínimo 8 caracteres, letra maiúscula, minúscula, número e símbolo.
+   * 
+   * @param value A senha a validar
+   * @return Uma mensagem de erro ou null se válida
+   */
   static String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Password is required';
@@ -33,6 +52,14 @@ class AppValidators {
     return null; 
   }
 
+  /**
+   * Valida a confirmação de senha.
+   * Verifica que a confirmação é igual à senha original.
+   * 
+   * @param value A confirmação de senha
+   * @param originalPassword A senha original
+   * @return Uma mensagem de erro ou null se coincidirem
+   */
   static String? validateConfirmPassword(String? value, String originalPassword) {
     if (value == null || value.isEmpty) {
       return 'Please confirm your password';
@@ -43,6 +70,13 @@ class AppValidators {
     return null;
   }
 
+  /**
+   * Valida um nome de utilizador.
+   * Requer: mínimo 3 caracteres.
+   * 
+   * @param value O username a validar
+   * @return Uma mensagem de erro ou null se válido
+   */
   static String? validateUsername(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please insert your username';
@@ -53,6 +87,12 @@ class AppValidators {
     return null;
   }
 
+  /**
+   * Valida que uma senha não está vazia (validação simples para login).
+   * 
+   * @param value A senha a validar
+   * @return Uma mensagem de erro ou null se válida
+   */
   static String? validateNonEmptyPassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Password is required';

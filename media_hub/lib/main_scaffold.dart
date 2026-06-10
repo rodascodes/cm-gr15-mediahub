@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:media_hub/bottom_navbar.dart';
 
+/**
+ * Scaffold principal que envolve os ecrãs da bottom nav.
+ * Mantém a [CustomBottomNavBar] persistente durante a navegação entre tabs.
+ */
 class MainScaffold extends StatelessWidget {
   final Widget child;
 
@@ -9,6 +13,14 @@ class MainScaffold extends StatelessWidget {
 
   static final List<String> routes = ['/home', '/search', '/forum', '/profile'];
 
+  /**
+   * Determina o índice ativo na bottom nav com base na rota atual.
+   * Usa [startsWith] para suportar sub-rotas (ex: /home/detalhes ainda marca Home).
+   * Retorna 0 (Home) como fallback se a rota não corresponder a nenhuma das tabs.
+   * 
+   * @param location A localização/caminho da rota atual
+   * @return O índice da aba ativa
+   */
   int getPageLocationIndex(String location) {
     final index = routes.indexWhere((route) => location.startsWith(route));
     return index < 0 ? 0 : index;
