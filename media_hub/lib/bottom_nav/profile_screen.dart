@@ -6,12 +6,6 @@ import 'package:media_hub/util/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:media_hub/util/tmdb_service.dart';
 
-
-class _MockupUser {
-  //static int ratings = 247;
-  static int hours = 156;
-  static int top = 5;
-}
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -117,8 +111,7 @@ class _Header extends StatelessWidget {
             children: [
               _StatCard(value: "${user.stats.totalMedia}", stat: "Ratings"),
               _StatCard(value: "${user.stats.average}", stat: "Avg. Score"),
-              _StatCard(value: "${_MockupUser.hours}h", stat: "Time"),
-              _StatCard(value: "Top ${_MockupUser.top}%", stat: ""),
+              //there was no time to implement the rest
             ],
           ),
         ],
