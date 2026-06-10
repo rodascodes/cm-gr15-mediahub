@@ -1,16 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:media_hub/app_util_classes.dart';
 import 'package:media_hub/services/auth_service.dart';
+import 'package:media_hub/services/user_services.dart';
 import 'package:media_hub/util/app_colors.dart';
 import 'package:go_router/go_router.dart';
+import 'package:media_hub/util/tmdb_service.dart';
 
-class _MockupUser {
-  static String name = "João Silva";
-  static String username = "joaosilva";
-  static int ratings = 247;
-  static double average = 7.8;
-  static int hours = 156;
-  static int top = 5;
-  static Map<String, int> mediaTypes = {"Movies" : 89, "TV Shows" : 124, "Books" : 34};
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      body: FutureBuilder<AppUser>(
+        future: UserServices().getUser(),
+        builder: (context, snapshot) {
+
+          //loading stuff
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          //error
+          if (snapshot.hasError || !snapshot.hasData) {
+            return const Center(child: Text("Error loading user"));
+          }
+
+          final user = snapshot.data!;
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                _Header(user: user),
+                _CategorySection(user: user),
+                _Ratings(user: user),
+                _FavouritesDisplay(user: user),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
 //stat cards to be used on header with information about user ratings , average rating, etc
@@ -41,7 +72,9 @@ class _StatCard extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header();
+  final AppUser user;
+  
+  const _Header({required this.user});
 
   @override
   Widget build(BuildContext context)
@@ -61,24 +94,25 @@ class _Header extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(_MockupUser.name, style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+              Text(user.name, style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
               GestureDetector(
-                child: Icon(Icons.settings, color: Colors.white),
+                child: Icon(Icons.logout_outlined, color: Colors.black),
                 onTap: () {
-                  print("TODO: Implement settings functionality");
+                  AuthService().logout();
+                  context.go('/login');
                 },
               ),
             ],
           ),
-          Text("@${_MockupUser.username}", style: TextStyle(color: Colors.white70)),
+          Text("@${user.username}", style: TextStyle(color: Colors.white70)),
           SizedBox(height: 16), //just to give an empty space before inserting the row with the stat cards
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 16,
             children: [
-              _StatCard(value: "${_MockupUser.ratings}", stat: "Ratings"),
-              _StatCard(value: "${_MockupUser.average}", stat: "Avg. Score"),
-              _StatCard(value: "${_MockupUser.hours}h", stat: "Time"),
-              _StatCard(value: "Top ${_MockupUser.top}%", stat: ""),
+              _StatCard(value: "${user.stats.totalMedia}", stat: "Ratings"),
+              _StatCard(value: "${user.stats.average}", stat: "Avg. Score"),
+              //there was no time to implement the rest
             ],
           ),
         ],
@@ -87,28 +121,34 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _CategoryCard extends StatelessWidget{
+class _CategoryCard extends StatelessWidget {
   final IconData icon;
   final String mediaType;
   final int numberWatched;
 
-  const _CategoryCard({required this.icon, required this.mediaType, required this.numberWatched});
+  const _CategoryCard({
+    required this.icon,
+    required this.mediaType,
+    required this.numberWatched,
+  });
+
+
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Container(
       width: 100,
-      padding: EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.grey.shade200,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
-          Icon(icon, color: Colors.purple,),
-          SizedBox(height: 8,),
-          Text("$numberWatched", style: TextStyle(fontWeight: FontWeight.bold),),
+          Icon(icon, color: Colors.purple),
+          const SizedBox(height: 8),
+          Text("$numberWatched",style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           Text(mediaType),
         ],
       ),
@@ -118,11 +158,20 @@ class _CategoryCard extends StatelessWidget{
 
 class _CategorySection extends StatelessWidget{
   static const Map<String, IconData> icons = {
-    "Movies": Icons.movie,
-    "TV Shows": Icons.tv,
-    "Books": Icons.book,
+    "movie": Icons.movie,
+    "tv": Icons.tv,
+    "books": Icons.book,
   };
-  const _CategorySection();
+
+  final AppUser user;
+  const _CategorySection({required this.user});
+
+  String capitalizeString(String word)
+  {
+    return word[0] == 't'
+                              ? '${word[0].toUpperCase()}${word.substring(1)}' //i dont want TV to be Tvs
+                              : '${word[0].toUpperCase()}${word.substring(1)}s';
+  }
 
   @override
   Widget build(BuildContext context)
@@ -133,29 +182,56 @@ class _CategorySection extends StatelessWidget{
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("Categories", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          SizedBox(height: 12), //to give some space
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              for(String mediaType in _MockupUser.mediaTypes.keys)
-                _CategoryCard(icon: icons[mediaType] ?? Icons.help, mediaType: mediaType, numberWatched: _MockupUser.mediaTypes[mediaType] ?? 0) //in flutter ?? means if there is not any then do this instead
-            ],
+          SizedBox(height: 12),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child:
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child:
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 16,
+                    children: [
+                      for(String mediaType in user.media.keys)
+                      GestureDetector(
+                        onTap: () {
+                          context.push('/collection', extra: 
+                          {
+                            'title': "${user.username}'s ${capitalizeString(mediaType)} list", 
+                            'items': user.media[mediaType]
+                          });
+                        },
+                        child: _CategoryCard(
+                          icon: icons[mediaType] ?? Icons.help,
+                          mediaType: mediaType[0] == 't'
+                              ? '${mediaType[0].toUpperCase()}${mediaType.substring(1)}' //i dont want TV to be Tvs
+                              : '${mediaType[0].toUpperCase()}${mediaType.substring(1)}s',
+                          numberWatched: user.media[mediaType]?.length ?? 0,
+                        ),
+                      ),  
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
+          
         ],
       ),
     );
   }
 }
 
-//DUE TO TIME CONSTRAINTS, FROM HERE ON OUT THINGS WILL BE HARD CODED JUST TO SHOW HOW IT WOULD LOOK LIKE.
-//after getting data from a database things will no longer be hardcoded (will be using something like the MockupUser being used above)
-//but for now this will do
-
 class _RatingRow extends StatelessWidget{
   final int rating;
   final int count;
+  final int totalRated;
   
-  const _RatingRow({required this.rating, required this.count});
+  const _RatingRow({required this.rating, required this.count, required this.totalRated});
 
   @override
   Widget build(BuildContext context)
@@ -166,7 +242,7 @@ class _RatingRow extends StatelessWidget{
         SizedBox(width: 8,),
         Expanded( //takes whatever space is available to expand. kinda like a flexbox in css
           child: LinearProgressIndicator(
-            value: (count / _MockupUser.ratings),
+            value: (count / totalRated),
             minHeight: 6,
           )
         ),
@@ -177,7 +253,8 @@ class _RatingRow extends StatelessWidget{
 }
 
 class _Ratings extends StatelessWidget{
-  const _Ratings();
+  final AppUser user;
+  const _Ratings({required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -185,12 +262,12 @@ class _Ratings extends StatelessWidget{
       padding: EdgeInsets.all(16),
       child: Column(
         children: [
-          _RatingRow(rating: 10, count: 45),
-          _RatingRow(rating: 9, count: 62),
-          _RatingRow(rating: 8, count: 71),
-          _RatingRow(rating: 7, count: 38),
-          _RatingRow(rating: 6, count: 19),
-          _RatingRow(rating: 5, count: 12),
+          for (int i in user.stats.ratings.keys)
+            for (var count in [user.stats.ratings[i]])
+              //this is the only safe way for it not to complain
+              if (count is int && count >= 1)
+                _RatingRow(rating: i, count: count, totalRated: user.stats.totalMedia,),
+                  
         ],
       ),
     );
@@ -198,16 +275,23 @@ class _Ratings extends StatelessWidget{
 }
 
 class _Favourite extends StatelessWidget{
-  final String title, mediaType;
-  final int rating;
+  final String title, mediaType, image;
+  final String? rating;
+  final int id;
 
-  const _Favourite({required this.title, required this.mediaType, required this.rating});
+  const _Favourite({required this.title, required this.mediaType, required this.rating, required this.image, required this.id});
 
   @override
   Widget build(BuildContext context)
   {
     return GestureDetector(
-      onTap: () => context.push('/info'),
+      onTap: () async {
+        final media = await TmdbService().getMediaFromId(id, mediaType.toLowerCase());
+        if(context.mounted)
+        {
+          context.push('/info', extra: media);
+        }
+      },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         padding: EdgeInsets.all(12),
@@ -217,7 +301,18 @@ class _Favourite extends StatelessWidget{
         ),
         child: Row(
           children: [
-            SizedBox(height: 100, width: 50, child: Image.network("https://cdn.nos.pt/cinemas/movies/files/700x1000/ad6c2d27-24a4-4736-a31c-aa2b9826cbdc_Image.jpg"),),
+            SizedBox(
+              height: 100,
+              width: 70,
+              child: image.isNotEmpty
+                  ? Image.network(image, fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace)
+                    {
+                      return const Icon(Icons.image_not_supported);
+                    },
+                    )
+                  : const Icon(Icons.image_not_supported),
+            ),
             SizedBox(width: 10),
             Expanded(
               child:Column(
@@ -238,53 +333,40 @@ class _Favourite extends StatelessWidget{
 
 }
 
-class _FavouritesDisplay extends StatelessWidget{
-  const _FavouritesDisplay();
 
-  @override
-  Widget build(BuildContext context)
-  {
-    return Column(
-      children: [
-        _Favourite(title: "El Projeto Ave Maria", mediaType: "Movie", rating: 10),
-        _Favourite(title: "El Projeto Ave Maria 2", mediaType: "Movie", rating: 10),
-        _Favourite(title: "El Projeto Ave Maria: El Seriado de Netflix", mediaType: "Tv Show", rating: 10),
-      ],
-    );
+class _FavouritesDisplay extends StatelessWidget {
+  final AppUser user;
+  const _FavouritesDisplay({required this.user});
+
+  Future<Map<String, String>> _loadMedia(MediaStats m) {
+    return TmdbService().getTitleAndPoster(m.id, m.mediaType);
   }
-}
-
-class _LogoutButton extends StatelessWidget {
-  const _LogoutButton();
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        AuthService().logout();
-        context.go('/login');
-      },
-      child: Text("Logout"),
-    );
-  }
-}
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          for (MediaStats m in user.stats.favorites)
+            FutureBuilder<Map<String, String>>(
+              future: _loadMedia(m),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const CircularProgressIndicator();
+                }
 
-class ProfileScreen extends StatelessWidget{
-  const ProfileScreen({super.key});
+                final data = snapshot.data!;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _Header(),
-            _CategorySection(),
-            _Ratings(),
-            _FavouritesDisplay(),
-            _LogoutButton(),
-          ],
-        ),
+                return _Favourite(
+                  title: data['title'] ?? '',
+                  mediaType: '${m.mediaType[0].toUpperCase()}${m.mediaType.substring(1)}',
+                  image: data['posterUrl'] ?? '',
+                  id: m.id,
+                  rating: m.score.toString(),
+                );
+              },
+            ),
+        ],
       ),
     );
   }

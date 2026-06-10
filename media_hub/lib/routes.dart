@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:media_hub/app_util_classes.dart';
 import 'package:media_hub/bottom_nav/forum_screen.dart';
 import 'package:media_hub/bottom_nav/home_screen.dart';
 import 'package:media_hub/bottom_nav/profile_screen.dart';
@@ -7,6 +8,7 @@ import 'package:media_hub/bottom_nav/search_screen.dart';
 import 'package:media_hub/login.dart';
 import 'package:media_hub/main_scaffold.dart';
 import 'package:media_hub/page_info.dart';
+import 'package:media_hub/profile_pages/user_list.dart';
 import 'package:media_hub/register.dart';
 import 'package:media_hub/services/auth_service.dart';
 import 'package:media_hub/util/mediacard.dart';
@@ -83,6 +85,19 @@ final router = GoRouter(
         final media = state.extra as Media;
 
         return MoviePage(media: media);
+      },
+    ),
+
+    GoRoute
+    (
+      path: '/collection',
+      builder: (context, state) {
+        final data = state.extra as Map<String, dynamic>;
+
+        return UserList(
+          title: data['title'],
+          mediaStatsList: (data['items'] as Map<String, MediaStats>),
+        );
       },
     ),
   ],

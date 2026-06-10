@@ -11,41 +11,41 @@ class SearchPage extends StatefulWidget {
   State<SearchPage> createState() => _SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _SearchPageState extends State<SearchPage> with AutomaticKeepAliveClientMixin {
+  
+  @override
+  bool get wantKeepAlive => true;
   late TextEditingController _searchController;
   final tmdbService = TmdbService();
-  String _selectedCategory = 'All'; // Track selected category
+
+  late Future<List<Media>> _trendingFutureMovies;
+  late Future<List<Media>> _trendingFutureTV;
+  late Future<List<Media>> _currentMediaFuture;
+
+  String _selectedCategory = 'All'; 
 
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
+    _trendingFutureMovies = tmdbService.getTrending('/movie');
+    _trendingFutureTV = tmdbService.getTrending('/tv');
+    _currentMediaFuture = _getMedia('');
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  Future<List<Media>> _getMedia() async {
-    final query = _searchController.text.trim();
-    
-    // If search is empty, show trending based on category
+  Future<List<Media>> _getMedia(String query) async {
     if (query.isEmpty) {
       if (_selectedCategory == 'Movies') {
-        return tmdbService.getTrending('/movie/');
+        return _trendingFutureMovies;
       } else if (_selectedCategory == 'Series') {
-        return tmdbService.getTrending('/tv/');
+        return _trendingFutureTV;
       } else {
-        // For 'All', combine movies and TV
-        final movies = await tmdbService.getTrending('/movie/');
-        final tvShows = await tmdbService.getTrending('/tv/');
-        return [...movies, ...tvShows]; //Spread operator to combine lists
+        final movies = await _trendingFutureMovies;
+        final tvShows = await _trendingFutureTV;
+        return [...movies, ...tvShows];
       }
     }
     
-    // If search has text, search and filter by category
     final results = await tmdbService.search(query);
     if (_selectedCategory == 'Movies') {
       return results.where((media) => media.type == 'Movie').toList();
@@ -55,11 +55,25 @@ class _SearchPageState extends State<SearchPage> {
     return results;
   }
 
+  void _updateSearch() {
+    setState(() {
+      _currentMediaFuture = _getMedia(_searchController.text.trim());
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, //remove the navigation arrow
         actions: [
           IconButton(
             icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
@@ -68,14 +82,15 @@ class _SearchPageState extends State<SearchPage> {
             },
           ),
         ],
-        title: Column(
+        title: Column(   
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             Text(
               'Search',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
             ),
+            Text('Find your favorite content', style: TextStyle(fontSize: 12)),
           ],
         ),
       ),
@@ -89,7 +104,7 @@ class _SearchPageState extends State<SearchPage> {
               child: TextField(
                 controller: _searchController,
                 onChanged: (value) {
-                  setState(() {});
+                  _updateSearch();
                 },
                 decoration: InputDecoration(
                   hintText: 'Search for movies, series, books...',
@@ -118,9 +133,8 @@ class _SearchPageState extends State<SearchPage> {
                     colors: const [Color(0xFFB066FE), Color(0xFFE943AD)],
                     isSelected: _selectedCategory == 'All',
                     onPressed: () {
-                      setState(() {
                         _selectedCategory = 'All';
-                      });
+                        _updateSearch();
                     },
                   ),
                   const SizedBox(width: 8),
@@ -130,9 +144,8 @@ class _SearchPageState extends State<SearchPage> {
                     colors: const [Color(0xFF3399FF), Color(0xFF00B4DB)],
                     isSelected: _selectedCategory == 'Movies',
                     onPressed: () {
-                      setState(() {
                         _selectedCategory = 'Movies';
-                      });
+                        _updateSearch();
                     },
                   ),
                   const SizedBox(width: 8),
@@ -142,9 +155,8 @@ class _SearchPageState extends State<SearchPage> {
                     colors: const [Color(0xFF20E2D7), Color(0xFF00C896)],
                     isSelected: _selectedCategory == 'Series',
                     onPressed: () {
-                      setState(() {
                         _selectedCategory = 'Series';
-                      });
+                        _updateSearch();
                     },
                   ),
                   const SizedBox(width: 8),
@@ -152,8 +164,10 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
             const SizedBox(height: 16),
+
+
   FutureBuilder<List<Media>>(
-    future: _getMedia(),
+    future: _currentMediaFuture,
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
         return const Center(

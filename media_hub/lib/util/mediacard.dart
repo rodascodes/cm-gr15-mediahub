@@ -63,23 +63,17 @@ class MediaCard extends StatelessWidget {
 }
 
 class HorizontalMediaCard extends StatelessWidget {
-  final String title;
-  final String type;
-  final double rating;
-  final String imageUrl;
+  final Media media;
 
   const HorizontalMediaCard({
     super.key,
-    required this.title,
-    required this.type,
-    required this.rating,
-    required this.imageUrl,
+    required this.media,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/info'),
+      onTap: () => context.push('/info', extra: media),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12), 
         padding: const EdgeInsets.all(8),
@@ -93,7 +87,7 @@ class HorizontalMediaCard extends StatelessWidget {
               width: 70, height: 70,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: NetworkImage(imageUrl),
+                  image: NetworkImage(media.imageUrl),
                   fit: BoxFit.cover,
                 ),
                 borderRadius: BorderRadius.circular(10),
@@ -105,15 +99,15 @@ class HorizontalMediaCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(media.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   const SizedBox(height: 4),
-                  Text(type, style: TextStyle(color: Theme.of(context).hintColor, fontSize: 14)),
+                  Text(media.type, style: TextStyle(color: Theme.of(context).hintColor, fontSize: 14)),
                   const SizedBox(height: 6),
                   Row(
                     children: [
                       const Icon(Icons.star, size: 16, color: Colors.amber),
                       const SizedBox(width: 4),
-                      Text(rating.toString(), style: const TextStyle(fontWeight: FontWeight.w500)),
+                      Text(media.rating.toStringAsFixed(1), style: const TextStyle(fontWeight: FontWeight.w500)),
                     ],
                   ),
                 ],
