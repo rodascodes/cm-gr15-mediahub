@@ -107,7 +107,8 @@ class _Header extends StatelessWidget {
           Text("@${user.username}", style: TextStyle(color: Colors.white70)),
           SizedBox(height: 16), //just to give an empty space before inserting the row with the stat cards
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 16,
             children: [
               _StatCard(value: "${user.stats.totalMedia}", stat: "Ratings"),
               _StatCard(value: "${user.stats.average}", stat: "Avg. Score"),
@@ -165,6 +166,13 @@ class _CategorySection extends StatelessWidget{
   final AppUser user;
   const _CategorySection({required this.user});
 
+  String capitalizeString(String word)
+  {
+    return word[0] == 't'
+                              ? '${word[0].toUpperCase()}${word.substring(1)}' //i dont want TV to be Tvs
+                              : '${word[0].toUpperCase()}${word.substring(1)}s';
+  }
+
   @override
   Widget build(BuildContext context)
   {
@@ -185,16 +193,26 @@ class _CategorySection extends StatelessWidget{
                   scrollDirection: Axis.horizontal,
                   child:
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 16,
                     children: [
                       for(String mediaType in user.media.keys)
-                        _CategoryCard(
+                      GestureDetector(
+                        onTap: () {
+                          context.push('/collection', extra: 
+                          {
+                            'title': "${user.username}'s ${capitalizeString(mediaType)} list", 
+                            'items': user.media[mediaType]
+                          });
+                        },
+                        child: _CategoryCard(
                           icon: icons[mediaType] ?? Icons.help,
                           mediaType: mediaType[0] == 't'
                               ? '${mediaType[0].toUpperCase()}${mediaType.substring(1)}' //i dont want TV to be Tvs
                               : '${mediaType[0].toUpperCase()}${mediaType.substring(1)}s',
                           numberWatched: user.media[mediaType]?.length ?? 0,
                         ),
+                      ),  
                     ],
                   ),
                 ),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:media_hub/app_util_classes.dart';
 import '../util/mediacard.dart';
 
 
@@ -187,5 +188,16 @@ class TmdbService {
     }
 
     throw Exception("It's joever");
+  }
+
+  Future<List<Media>> getMediaListFromMediaStatsList(List<MediaStats> mslist) async
+  {
+    List<Media> mediaList = [];
+    for(MediaStats m in mslist)
+    {
+      mediaList.add(await getMediaFromId(m.id, m.mediaType));
+    }
+    print("recebi ${mslist.length}, e tou a enviar ${mediaList.length}");
+    return mediaList;
   }
 }
