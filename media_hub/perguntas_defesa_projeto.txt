@@ -1,0 +1,22 @@
+
+Pergunta 1:
+
+Foi utilizado um StatelessWidget.
+
+
+Pergunta 2:
+
+Sim utilizamos métodos assíncronos para evitar erros na interface enquanto são executadas operações que possam demorar mais tempo.
+
+
+Pergunta 3:
+
+Main Axis
+
+Numa Row → horizontal
+Numa Column → vertical
+
+Cross Axis
+
+Numa Row → vertical
+Numa Column → horizontal
